@@ -1,0 +1,165 @@
+@page "/C_Entradas"
+
+<EditForm Model="lista">
+    <div class="card" style="margin:30px;">
+        <div class="card-header">
+            <h5 style="text-align:center;">Consulta de Entradas</h5>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form>
+            <div class="input-group d-flex align-items-end">
+
+                @* Filtro *@
+                <div class="input-group" style="margin-right: 30px; width: 16rem;">
+                    <span class="input-group-text">Filtro</span>
+                    <InputSelect class="form-control col-2" @bind-Value="Filtro">
+                        <option value="1" selected>ID</option>
+                        <option value="2">Operario</option>
+                        <option value="3">Almacen Origen</option>
+                        <option value="4">Costo Total</option>
+                        <option value="5">Cantidad materiales</option>
+                    </InputSelect>
+                </div>
+
+                @* Fecha Desde *@
+                <div class="input-group" style=" margin-right: 10px; width: 15rem;">
+                    <span class="input-group-text">Desde</span>
+                    <InputDate @bind-Value="FechaDesde" class="form-control col-4" />
+                </div>
+
+                @* Fecha Hasta*@
+                <div class="input-group" style=" width: 15rem;">
+                    <span class="input-group-text">Hasta</span>
+                    <InputDate @bind-Value="FechaHasta" class="form-control col-4" />
+                </div>
+
+                @* TextBox Busqueda *@
+                <div class="flex-fill mx-2">
+                    <div class="input-group">
+                        <span class="input-group-text">Busqueda</span>
+                        <InputText class="form-control" @bind-Value="Criterio" />
+                    </div>
+                </div>
+
+                    @* Boton Buscar *@
+                    <button type="button"  style="z-index:0;" class="btn btn-primary" @onclick="Buscar">
+                        <i class="oi oi-magnifying-glass mr-2" /> Buscar
+                    </button>
+                </div>
+        </form>
+    </div>
+    @* Tabla  *@
+    <table class="table table-light table-striped table-hover">
+        <thead class="thead">
+            <tr class="table table-light">
+                <th>ID</th>
+                <th>Operario</th>
+                <th>Almacen origen</th>
+                <th>Costo Total</th>
+                <th>Cantidad Materiales</th>
+                <th>Fecha registro</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (lista.Count == 0)
+            {
+                <span style="color:#FFFFFF; text-shadow: 1.5px 2px rgba(0, 0, 0, 0.4); margin: 20px; text-align:center">No
+                    hay entradas registradas</span>
+            }
+            else
+            {
+                @foreach (var item in lista)
+                {
+                    Fecha = DateOnly.FromDateTime(item.FechaEntrada);
+                    <tr>
+                        <td>@item.EntradaId</td>
+                        <td>@item.Operario</td>
+                        <td>@item.AlmacenOrigen.DenominacionAlmacen</td>
+                        <td>@item.PrecioTotal</td>
+                        <td>@item.MaterialesRecibidos.Count</td>
+                        <td>@Fecha</td>
+                        <td><a class="btn btn-sm btn-outline-primary oi oi-eye" href="EntradasAlmacen/@item.EntradaId"> Ver</a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</EditForm>
+
+
+@code {
+
+    [Inject]
+    public EntradasBLL entradasBLL { get; set; }
+    public List<EntradasAlmacen> lista { get; set; } = new List<EntradasAlmacen>();
+    public string? Filtro { get; set; }
+    private DateOnly Fecha { get; set; }
+    private string? Criterio { get; set; }
+    private DateTime FechaDesde { get; set; } = new DateTime(1990, 12, 31);
+    private DateTime FechaHasta { get; set; } = DateTime.Today.AddDays(1);
+
+    protected override void OnInitialized()
+    {
+        lista = entradasBLL.GetList(m => true);
+    }
+    public void Buscar()
+    {
+        lista = new List<EntradasAlmacen>();
+        if (Criterio != null)
+        {
+            switch (Filtro)
+            {
+                case "1": //Id
+                    {
+                        int ID = Utilities.ToInt(Criterio);
+                        if (ID == -1)
+                            lista = entradasBLL.GetList(m => m.FechaEntrada>= FechaDesde && m.FechaEntrada <= FechaHasta);
+                        else
+                            lista = entradasBLL.GetList(m => m.EntradaId == ID && m.FechaEntrada >= FechaDesde && m.FechaEntrada <=
+                            FechaHasta);
+                        break;
+                    }
+                case "2": //Operario
+                    {
+                        lista = entradasBLL.GetList(m => m.Operario.ToLower().Contains(Criterio.ToLower()) && m.FechaEntrada >= FechaDesde
+                        && m.FechaEntrada <= FechaHasta);
+                        break;
+                    }
+                case "3": //Almacen Origen
+                    {
+                        lista = entradasBLL.GetList(m => m.AlmacenOrigen.DenominacionAlmacen.ToLower().Contains(Criterio.ToLower()) && m.FechaEntrada >= FechaDesde && m.FechaEntrada <=
+                        FechaHasta);
+
+                        break;
+                    }
+                case "4": // Precio total
+                    {
+
+                        decimal precio = Utilities.ToDecimal(Criterio);
+                        if (precio == -1)
+                            lista = entradasBLL.GetList(m => m.FechaEntrada >= FechaDesde && m.FechaEntrada <= FechaHasta);
+                        else
+                            lista = entradasBLL.GetList(m => m.PrecioTotal == precio && m.FechaEntrada >= FechaDesde && m.FechaEntrada <= FechaHasta);
+                        break;
+                    }
+                case "5": //cantidad elementos 
+                    {
+                        int CantidadElementos = Utilities.ToInt(Criterio);
+                        if (CantidadElementos == -1)
+                            lista = entradasBLL.GetList(m => m.FechaEntrada >= FechaDesde && m.FechaEntrada <= FechaHasta);
+                        else
+                            lista = entradasBLL.GetList(m => m.MaterialesRecibidos.Count == CantidadElementos && m.FechaEntrada >= FechaDesde && m.FechaEntrada <= FechaHasta);
+                        break;
+                    }
+            }
+        }
+        else
+        {
+            lista = entradasBLL.GetList(m => true);
+        }
+    }
+}

@@ -1,0 +1,72 @@
+﻿<div class="top-row ps-3 navbar" style="background-color: #00000000;">
+    <div class="container-fluid align-items-center">
+        <a class="navbar-brand" style="color: black;" href="">SDT_ProyectoFinal</a>
+    </div>
+</div>
+
+<div class="@NavMenuCssClass">
+    <nav class="container-fluid">
+
+        <div class="button subnav">
+            <span class="oi oi-plus"></span>Registros 
+            <div class="subnav-content">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="R_Transportistas">
+                        <span aria-hidden="true"></span> Registro Transportista
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="R_Materiales">
+                        <span aria-hidden="true"></span> Registro Materiales
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="EntradasAlmacen">
+                        <span aria-hidden="true"></span> Entradas almac&eacute;n
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="SalidasAlmacen">
+                        <span aria-hidden="true"></span> Salidas almac&eacute;n
+                    </NavLink>
+                </div>
+            </div>
+        </div>
+        <div class="button subnav">
+            <span class="oi oi-list-rich"></span>Consultas 
+            <div class="subnav-content">
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="C_Transportistas">
+                        <span aria-hidden="true"></span> Consulta Transportista
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="C_Materiales">
+                        <span aria-hidden="true"></span> Consulta Materiales
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="C_Entradas">
+                        <span aria-hidden="true"></span> Entradas Almac&eacute;n
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="C_Salidas">
+                        <span aria-hidden="true"></span> Salidas Almac&eacute;n
+                    </NavLink>
+                </div>
+            </div>
+        </div>
+    </nav>
+</div>
+
+@code {
+    private bool collapseNavMenu = true;
+
+    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
+
+    private void ToggleNavMenu()
+    {
+        collapseNavMenu = !collapseNavMenu;
+    }
+}

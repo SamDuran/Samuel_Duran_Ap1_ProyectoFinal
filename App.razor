@@ -1,0 +1,12 @@
+﻿<Router AppAssembly="@typeof(App).Assembly">
+    <Found Context="routeData">
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+        <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(MainLayout)">
+            <h5 style="Margin: 60px; text-shadow: 0.7px 1.5px rgba(0, 0, 0, 0.5); text-align: center; color:black; font-size: 2.5rem;">Not found</h5>
+            <p role="alert" style="Margin: 60px; text-shadow: 0.7px 1.5px rgba(0, 0, 0, 0.5); text-align: center; color:black; font-size: 1.5rem;">Sorry, there's nothing at this address.</p>
+        </LayoutView>
+    </NotFound>
+</Router>

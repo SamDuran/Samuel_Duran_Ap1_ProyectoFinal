@@ -1,0 +1,263 @@
+﻿@page "/EntradasAlmacen"
+@page "/EntradasAlmacen/{EntradaId:int}"
+
+@inject IToastService toastService
+
+<EditForm Model="entrada">
+    <DataAnnotationsValidator />
+    <div className="Container" style="Margin: 15px;">
+        <div class="card">
+
+            <div class="card-header">
+                <h3 style="text-align: center;">Entradas de materiales</h3>
+            </div>
+
+            <div class="card-body" style="Margin: 15px 100px 15px 100px;">
+
+                @* ID *@
+                <div class="form-row align-items-center">
+                    <div class="col">
+                        <div class="form-group">
+                            <div class="input-group" style="margin: 22px; ">
+                                <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">ID
+                                    Entrada</span>
+                                <InputNumber @bind-Value="entrada.EntradaId" class="form-control col-4" />
+                                <div class="input-group-append">
+                                    <button type="button" style="z-index: 0;" class="btn btn-primary input-group-text"
+                                        @onclick="Buscar"><span class="oi oi-magnifying-glass">Buscar</span></button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Fecha registro *@
+                <div class="input-group" style="margin: 22px; ">
+                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Fecha de
+                        movimiento</span>
+                    <InputDate @bind-Value="entrada.FechaEntrada" class="form-control col-4" />
+                    <ValidationMessage For="@(() => entrada.FechaEntrada)" />
+                </div>
+
+                @* Operario *@
+                <div class="input-group" style="margin: 22px;">
+                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Operario</span>
+                    <InputText @bind-Value="entrada.Operario" class="form-control col-4" placeholder="¿Quién operó?" />
+                    <ValidationMessage For="@(() => entrada.Operario)" />
+                </div>
+
+
+                @* Almacen origen *@
+                <div class="input-group" style="margin: 22px;">
+                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Almacen origen</span>
+                    <InputSelect @bind-Value="entrada.AlmacenOrigen.AlmacenId" class="form-control col-4">
+                        <option selected hidden value="0">--) Seleccione un almacen origen (--</option>
+                        @foreach (var almacen in listaAlmacenes)
+                        {
+                            <option value="@almacen.AlmacenId">@almacen.DenominacionCentro: @almacen.NombreCentro  
+                                @almacen.DenominacionAlmacen: @almacen.NombreAlmacen</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => entrada.AlmacenOrigen)" />
+                </div>
+
+                @* Transportista *@
+                <div class="input-group" style="margin: 22px;">
+                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Transportista</span>
+                    <InputSelect @bind-Value="entrada.Transportista.TransportistaId" class="form-control col-4">
+                        <option selected hidden value="0">--) Seleccione un transportista (--</option>
+                        @foreach (var transportista in listaTransportistas)
+                        {
+                            <option value="@transportista.TransportistaId">@transportista.Nombres @transportista.Apellidos</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="@(() => entrada.Transportista)" />
+                </div>
+                @* subcard Materiales *@
+                <div class="card">
+
+                    <div class="card-header">
+                        <h3>Materiales recibidos</h3>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="input-group d-flex align-items-end">
+                            <div class="flex-fill mx-2">
+                                <label>Material</label>
+                                <InputSelect @bind-Value="materialID" class="form-control">
+                                    <option value="" selected="selected" disabled="disabled" hidden="hidden">
+                                        --Seleccione un material--</option>
+                                    @foreach (var item in listaMateriales)
+                                    {
+                                        <option value="@item.MaterialId.ToString()">@item.Descripcion (Cantidad: @item.Cantidad @item.UnidadesMedida)</option>
+                                    }
+                                </InputSelect>
+                            </div>
+                            <div class="flex-fill mx-2" style="width: 12px;">
+                                <label>Cantidad</label>
+                                <InputNumber class="form-control" @bind-Value="recibido.Cantidad" />
+                            </div>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary input-group-text"
+                                    @onclick="AgregarRecibido">
+                                    <span class="oi oi-plus"> Add</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        @* Tabla de detalles *@
+                        <table class="table t">
+                            <thead class="thead">
+                                <tr class="table">
+                                    <th>MaterialID</th>
+                                    <th>Descripci&oacute;n</th>
+                                    <th>Cantidad</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var recibido in this.entrada.MaterialesRecibidos)
+                                {
+                                    <tr>
+                                        <td>@recibido.material.MaterialId</td>
+                                        <td>@recibido.material.Descripcion</td>
+                                        <td>@recibido.Cantidad</td>
+                                        <td><span class="btn btn-sm btn-outline-secondary oi oi-x"
+                                            @onclick="@(() => RemoverRecibido(recibido))"></span></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        <div Class="form-group" style="margin: 22px;">
+                            <div class="input-group">
+                                <span class="input-group-text">Precio total:</span>
+                                <InputNumber readonly class="form-control" @bind-Value="entrada.PrecioTotal" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer">
+                @* Botones *@
+                <div class="form-group text-center" style="justify-content: space-between;">
+                    <button type="button" style="margin: 10px;" class="btn btn-lg btn-primary"
+                        @onclick="Nuevo">Nuevo</button>
+                    <button type="button" style="margin: 10px;" class="btn btn-lg btn-success"
+                        @onclick="Guardar">Guardar</button>
+                    <button type="button" style="margin: 10px;" class="btn btn-lg btn-danger"
+                        @onclick="Eliminar">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+
+    [Parameter]
+    public int EntradaId { get; set; }
+    public Almacenes AlmacenOrigen = new Almacenes();
+    public Transportistas transportista = new Transportistas();
+    public MaterialesRecibidos recibido { get; set; } = new MaterialesRecibidos();
+    public string? materialID {get;set;}
+    public EntradasAlmacen entrada { get; set; } = new EntradasAlmacen();
+    public List<Almacenes> listaAlmacenes { get; set; } = new List<Almacenes>();
+    public List<Materiales> listaMateriales { get; set; } = new List<Materiales>();
+    public List<Transportistas> listaTransportistas { get; set; } = new List<Transportistas>();
+
+    [Inject]
+    public EntradasBLL entradasBLL { get; set; }
+    [Inject]
+    public AlmacenBLL almacenBLL { get; set; }
+    [Inject]
+    public MaterialesBLL materialesBLL { get; set; }
+    [Inject]
+    public TransportistasBLL transportistasBLL { get; set; }
+
+    protected override void OnInitialized()
+    {
+        listaAlmacenes = almacenBLL.GetList();
+        listaMateriales = materialesBLL.GetList(e => true);
+        listaTransportistas = transportistasBLL.GetList(t => true);
+        entrada.EntradaId = EntradaId;
+        Buscar();
+    }
+    public void Buscar()
+    {
+        if (this.entrada.EntradaId > 0)
+        {
+            var encontrado = entradasBLL.Buscar(this.entrada.EntradaId);
+
+            if (encontrado != null)
+                this.entrada = encontrado;
+            else
+                toastService.ShowError($"No se encontro un registro con {entrada.EntradaId} como ID");
+        }
+    }
+    public void AgregarRecibido()
+    {
+        if(materialesBLL.Buscar(recibido.material.MaterialId)!=null)
+            this.recibido.material = materialesBLL.Buscar(recibido.material.MaterialId);
+        else
+            return;
+
+        entrada.PrecioTotal += recibido.Cantidad * recibido.material.Costo;
+
+        bool existe = entrada.MaterialesRecibidos.Any(m => m.material.MaterialId == recibido.material.MaterialId);
+
+        if (!existe)
+        {
+            this.entrada.MaterialesRecibidos.Add(this.recibido);
+        }
+        else
+        {
+            var materialBuscado = entrada.MaterialesRecibidos.Find(m => m.material.MaterialId == recibido.material.MaterialId);
+            if (materialBuscado != null)
+            {
+                entrada.PrecioTotal -= materialBuscado.Cantidad*recibido.material.Costo;
+                recibido.Cantidad += materialBuscado.Cantidad;
+                entrada.MaterialesRecibidos.Remove(materialBuscado);
+                entrada.MaterialesRecibidos.Add(recibido);
+            }
+        }
+        this.recibido = new MaterialesRecibidos();
+    }
+    public void RemoverRecibido(MaterialesRecibidos recibido)
+    {
+        this.entrada.MaterialesRecibidos.Remove(recibido);
+        entrada.PrecioTotal -= recibido.Cantidad * recibido.material.Costo;
+    }
+    public void Guardar()
+    {
+        AlmacenOrigen = almacenBLL.Buscar(entrada.AlmacenOrigen.AlmacenId);
+        transportista = transportistasBLL.Buscar(entrada.Transportista.TransportistaId);
+        if (AlmacenOrigen != null)
+            entrada.AlmacenOrigen = AlmacenOrigen;
+
+        if(transportista != null) 
+            entrada.Transportista = transportista;
+
+        if (entradasBLL.Guardar(entrada))
+            toastService.ShowSuccess("Se guardó exitosamente");
+        else
+            toastService.ShowError("No se pudo guardar.");
+    }
+    public void Nuevo()
+    {
+        entrada = new EntradasAlmacen();
+    }
+    public void Eliminar()
+    {
+        if (entradasBLL.Eliminar(entrada.EntradaId))
+        {
+            toastService.ShowSuccess("Eliminación Exitosa");
+            Nuevo();
+        }
+        else
+        {
+            toastService.ShowError("No se pudo eliminar.");
+        }
+    }
+}

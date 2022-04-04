@@ -1,0 +1,24 @@
+﻿@using Blazored.Toast.Configuration
+@inherits LayoutComponentBase
+
+<PageTitle>Proyecto Final</PageTitle>
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
+<BlazoredToasts Position="ToastPosition.BottomRight"
+                Timeout="10">
+    <CloseButtonContent>
+        <div>
+            <span>&times;</span>
+        </div>
+    </CloseButtonContent>
+</BlazoredToasts>

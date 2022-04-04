@@ -1,0 +1,143 @@
+﻿@page "/C_Transportistas"
+
+<EditForm Model="lista">
+    <div class="card" style="margin:30px;">
+        <div class="card-header">
+            <h5 style="text-align:center;">Consulta de transportistas</h5>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <form>
+            <div class="input-group d-flex align-items-end">
+
+                @* Filtro *@
+                <div class="input-group" style="margin-right: 30px; width: 16rem;">
+                    <span class="input-group-text">Filtro</span>
+                    <InputSelect class="form-control col-2" @bind-Value="Filtro">
+                        <option value="1" selected>ID</option>
+                        <option value="2">Nombres</option>
+                        <option value="3">Apellidos</option>
+                        <option value="4">No.Carnet</option>
+                    </InputSelect>
+                </div>
+
+                @* Fecha Desde *@
+                <div class="input-group" style=" margin-right: 10px; width: 15rem;">
+                    <span class="input-group-text">Desde</span>
+                    <InputDate @bind-Value="fechaDesde" class="form-control col-4" />
+                </div>
+
+                @* Fecha Hasta*@
+                <div class="input-group" style=" width: 15rem;">
+                    <span class="input-group-text">Hasta</span>
+                    <InputDate @bind-Value="fechaHasta" class="form-control col-4" />
+                </div>
+
+                @* TextBox Busqueda *@
+                <div class="flex-fill mx-2">
+                    <div class="input-group">
+                        <span class="input-group-text">Busqueda</span>
+                        <InputText class="form-control" @bind-Value="Criterio" />
+                    </div>
+                </div>
+
+                @* Boton Buscar *@
+                <button type="button" style="z-index:0;" class="btn btn-primary" @onclick="Buscar">
+                    <i class="oi oi-magnifying-glass mr-2" /> Buscar
+                </button>
+            </div>
+        </form>
+    </div>
+    @* Tabla *@
+    <table class="table table-light table-striped table-hover">
+            <thead class="thead">
+                <tr class="table table-light">
+                    <th>ID</th>
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th>No.Carnet</th>
+                    <th>Fecha Registro</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @if(lista.Count==0)
+                {
+                    <span style="color:#FFFFFF; text-shadow: 1.5px 2px rgba(0, 0, 0, 0.4); margin: 20px; text-align:center">No hay transportistas registrados</span>
+                }else
+                {
+                    @foreach (var item in lista)
+                    {
+                        Fecha = DateOnly.FromDateTime(item.FechaRegistro);
+                        <tr>
+                            <td>@item.TransportistaId</td>
+                            <td>@item.Nombres</td>
+                            <td>@item.Apellidos</td>
+                            <td>@item.NumeroCarnet</td>
+                            <td>@Fecha</td>
+                            <td><a class="btn btn-sm btn-outline-primary oi oi-eye" href="R_Transportistas/@item.TransportistaId"> Ver</a></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+</EditForm>
+
+
+@code {
+    [Inject]
+    public TransportistasBLL transportistasBLL { get; set; }
+    public List<Transportistas> lista { get; set; } = new List<Transportistas>();
+    public string? Filtro { get; set; }
+    private DateOnly Fecha { get; set; }
+    private string? Criterio { get; set; }
+    private DateTime fechaDesde { get; set; } = new DateTime(1990, 12, 31);
+    private DateTime fechaHasta { get; set; } = DateTime.Today.AddDays(1);
+
+    protected override void OnInitialized()
+    {
+        lista = transportistasBLL.GetList(t => true);
+    }
+    public void Buscar()
+    {
+        lista = new List<Transportistas>();
+        if(Criterio != null)
+        {
+            switch(Filtro)
+            {
+                case "1":
+                {
+                    int ID = Utilities.ToInt(Criterio);
+                    if(ID== -1)
+                        lista = transportistasBLL.GetList(t => t.FechaRegistro >= fechaDesde && t.FechaRegistro <= fechaHasta);
+                    else
+                        lista = transportistasBLL.GetList(t => t.TransportistaId == ID && t.FechaRegistro >= fechaDesde && t.FechaRegistro <= fechaHasta);
+                    break;
+                }
+                case "2":
+                {
+                    lista = transportistasBLL.GetList(t => t.Nombres.ToLower().Contains(Criterio.ToLower()) && t.FechaRegistro >= fechaDesde && t.FechaRegistro <= fechaHasta);
+                    break;
+                }
+                case "3":
+                {
+                    lista = transportistasBLL.GetList(t => t.Apellidos.ToLower().Contains(Criterio.ToLower()) && t.FechaRegistro >= fechaDesde && t.FechaRegistro <= fechaHasta);
+                    break;
+                }
+                case "4": 
+                {
+                    int NoCarnet = Utilities.ToInt(Criterio);
+                    if(NoCarnet == -1)
+                        lista = transportistasBLL.GetList(t => t.FechaRegistro >= fechaDesde && t.FechaRegistro <= fechaHasta);
+                    else
+                        lista = transportistasBLL.GetList(t => t.NumeroCarnet == NoCarnet && t.FechaRegistro >= fechaDesde && t.FechaRegistro <= fechaHasta);
+                    break;
+                }
+            }
+        }else
+        {
+            lista = transportistasBLL.GetList(t => true);
+        }
+    }
+}
