@@ -9,7 +9,5 @@ namespace Entidades
         public int AlmacenId { get; set; }
         public string NombreCentro { get; set; } = string.Empty;
         public string DenominacionCentro { get; set; } = string.Empty; //Esto porque puede ser de Edesur, edenorte o edeeste
-        public string NombreAlmacen { get; set; } = string.Empty;
-        public string DenominacionAlmacen { get; set; } = string.Empty;
     }
 }

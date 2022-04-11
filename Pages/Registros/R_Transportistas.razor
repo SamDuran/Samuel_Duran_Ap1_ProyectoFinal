@@ -2,7 +2,7 @@
 @page "/R_Transportistas/{TransportistaID:int}"
 
 @inject IToastService toastService
-
+<PageTitle>Registro de Transportistas</PageTitle>
 <EditForm Model="transportista" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
     <div className="Container" style="Margin: 15px;">
@@ -42,6 +42,7 @@
                     <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Nombres</span>
                     <InputText @bind-Value="transportista.Nombres" class="form-control col-4" 
                         placeholder="(Ejemplo: 'Juan Steven')"/>
+                        <ValidationMessage For="@(() => transportista.Nombres)"/>
                 </div>
 
                 @* Apellidos *@
@@ -49,12 +50,14 @@
                     <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Apellidos</span>
                     <InputText @bind-Value="transportista.Apellidos" class="form-control col-4" 
                         placeholder="(Ejemplo: 'Perez Mart&iacute;nez')"/>
+                        <ValidationMessage For="@(() => transportista.Apellidos)"/>
                 </div>
 
                 @* No.Carnet *@
                 <div class="input-group" style="margin: 22px; ">
                     <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">No.Carnet</span>
                     <InputNumber @bind-Value="transportista.NumeroCarnet" class="form-control col-4"/>
+                    <ValidationMessage For="@(() => transportista.NumeroCarnet)"/>
                 </div>
             </div>
 
@@ -77,7 +80,6 @@
 
     [Parameter]
     public int TransportistaID { get; set; }
-
     public Transportistas transportista { get; set; } = new Transportistas();
 
     [Inject]
@@ -102,10 +104,18 @@
     }
     public void Guardar()
     {
-        if(transportistaBLL.Guardar(transportista))
-            toastService.ShowSuccess("Se guardó exitosamente");
-        else
-            toastService.ShowError("No se pudo guardar.");
+        if(TransportistaValido())
+        {
+            if(transportistaBLL.Guardar(transportista))
+            {
+                toastService.ShowSuccess("Se guardó exitosamente");
+                Nuevo();
+            }
+            else
+            {
+                toastService.ShowError("No se pudo guardar.");
+            }
+        }
     }
     public void Nuevo()
     {
@@ -122,5 +132,23 @@
         {
             toastService.ShowError("No se pudo eliminar.");
         }
+    }
+    private bool TransportistaValido()
+    {
+        bool valido = true;
+        try
+        {
+            var TransportistaBuscado = transportistaBLL.BuscarPorCarnet(this.transportista.NumeroCarnet);
+            if(TransportistaBuscado !=null && TransportistaBuscado.TransportistaId != this.transportista.TransportistaId)
+            {
+                valido = false;
+                toastService.ShowError("El Carnet del transportista ya existe.", "Carnet existente");
+            }
+        }catch(Exception)
+        {
+            throw;
+        }
+
+        return valido;
     }
 }

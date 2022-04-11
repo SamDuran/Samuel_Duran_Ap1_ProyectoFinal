@@ -26,6 +26,22 @@ namespace BLL
             }
             return material;
         }
+        public Materiales? BuscarPorDescripcion(string descripcion)
+        {
+            Materiales? material;
+            try
+            {
+                material = contexto.Materiales
+                .Where(m => m.Descripcion.ToLower().Contains(descripcion.ToLower()))
+                .AsNoTracking()
+                .SingleOrDefault();
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+            return material;
+        }
         private bool Existe(int id)
         {
             bool existe = false;

@@ -1,6 +1,6 @@
 ﻿@page "/C_Materiales"
-
-<EditForm Model="lista">
+<PageTitle>Consulta de Materiales</PageTitle>
+<EditForm Model="lista" OnValidSubmit="@Buscar">
     <div class="card" style="margin:30px;">
         <div class="card-header">
             <h5 style="text-align:center;">Consulta de materiales</h5>
@@ -14,12 +14,13 @@
                 @* Filtro *@
                 <div class="input-group" style="margin-right: 30px; width: 16rem;">
                     <span class="input-group-text">Filtro</span>
-                    <InputSelect class="form-control col-2" @bind-Value="Filtro">
+                    <InputSelect class="form-select text-14 col-3" @bind-Value="Filtro">
                         <option value="1" selected>ID</option>
                         <option value="2">Descripci&oacute;n</option>
                         <option value="3">U/M</option>
                         <option value="4">Cantidad</option>
                         <option value="5">Costo</option>
+                        <option value="6">Valor Inventario</option>
                     </InputSelect>
                 </div>
 
@@ -43,14 +44,14 @@
                     </div>
                 </div>
 
-                    @* Boton Buscar *@
-                    <button type="button"  style="z-index:0;" class="btn btn-primary" @onclick="Buscar">
-                        <i class="oi oi-magnifying-glass mr-2" /> Buscar
-                    </button>
-                </div>
+                @* Boton Buscar *@
+                <button type="button" style="z-index:0;" class="btn btn-primary" @onclick="Buscar">
+                    <i class="oi oi-magnifying-glass mr-2" /> Buscar
+                </button>
+            </div>
         </form>
     </div>
-    @* Tabla  *@
+    @* Tabla *@
     <table class="table table-light table-striped table-hover">
         <thead class="thead">
             <tr class="table table-light">
@@ -59,6 +60,7 @@
                 <th>U/M</th>
                 <th>Cantidad</th>
                 <th>Costo</th>
+                <th>Valor Inventario</th>
                 <th>Fecha registro</th>
                 <th></th>
             </tr>
@@ -80,6 +82,7 @@
                         <td>@item.UnidadesMedida</td>
                         <td>@item.Cantidad</td>
                         <td>@item.Costo</td>
+                        <td>@item.ValorInventario</td>
                         <td>@Fecha</td>
                         <td><a class="btn btn-sm btn-outline-primary oi oi-eye" href="R_materiales/@item.MaterialId"> Ver</a>
                         </td>
@@ -155,11 +158,20 @@
                             lista = materialesBLL.GetList(m => m.Costo == Costo && m.FechaRegistro >= FechaDesde && m.FechaRegistro <= FechaHasta);
                         break;
                     }
+                    case "6": //ValorInventario
+                    {
+                        decimal ValorInventario = Utilities.ToDecimal(Criterio);
+                        if (ValorInventario == -1)
+                            lista = materialesBLL.GetList(m => m.FechaRegistro >= FechaDesde && m.FechaRegistro <= FechaHasta);
+                        else
+                            lista = materialesBLL.GetList(m => m.ValorInventario == ValorInventario && m.FechaRegistro >= FechaDesde && m.FechaRegistro <= FechaHasta);
+                        break;
+                    }
             }
         }
         else
         {
-            lista = materialesBLL.GetList(m => true);
+            lista = materialesBLL.GetList(m => m.FechaRegistro >= FechaDesde && m.FechaRegistro <= FechaHasta);
         }
     }
 }

@@ -40,6 +40,7 @@ namespace BLL
                 var entradaAnterior = contexto.EntradasAlmacenes
                 .Where(e => e.EntradaId == entrada.EntradaId)
                 .Include(e => e.MaterialesRecibidos)
+                .ThenInclude(m => m.material)
                 .Include(e => e.AlmacenOrigen)
                 .AsNoTracking()
                 .SingleOrDefault();
@@ -48,7 +49,7 @@ namespace BLL
                 {
                     foreach (var recibidoAnterior in entradaAnterior.MaterialesRecibidos)
                     {
-                        recibidoAnterior.material.Cantidad += recibidoAnterior.Cantidad;
+                        recibidoAnterior.material.Cantidad -= recibidoAnterior.Cantidad;
                     }
                     contexto.Database.ExecuteSqlRaw($"Delete FROM MaterialesRecibidos WHERE EntradaId={entrada.EntradaId}");
 
@@ -57,7 +58,8 @@ namespace BLL
                         contexto.Entry(recibido).State = EntityState.Added;
                         contexto.Entry(recibido.material).State = EntityState.Modified;
 
-                        recibido.material.Cantidad -= recibido.Cantidad;
+                        recibido.material.Cantidad += recibido.Cantidad;
+                        recibido.material.ValorInventario = recibido.material.Cantidad*recibido.material.Costo;
                     }
                     contexto.Entry(entrada).State = EntityState.Modified;
                     paso = contexto.SaveChanges()>0;
@@ -81,6 +83,7 @@ namespace BLL
                     contexto.Entry(recibido).State = EntityState.Added;
 
                     recibido.material.Cantidad += recibido.Cantidad;
+                    recibido.material.ValorInventario = recibido.material.Cantidad*recibido.material.Costo;
                 }
                 contexto.Entry(entrada.AlmacenOrigen).State = EntityState.Modified;
                 contexto.Entry(entrada.Transportista).State = EntityState.Modified;
@@ -99,10 +102,13 @@ namespace BLL
             try
             {
                 entrada = contexto.EntradasAlmacenes
+                .Where(e => e.EntradaId==id)
                 .AsNoTracking()
-                .Include(e => e.MaterialesRecibidos)
+                .Include(e => e.Transportista)
                 .Include(e => e.AlmacenOrigen)
-                .FirstOrDefault(e => e.EntradaId==id);
+                .Include(e => e.MaterialesRecibidos)
+                .ThenInclude(e => e.material)
+                .SingleOrDefault();
             }
             catch (System.Exception)
             {
@@ -125,6 +131,7 @@ namespace BLL
                         contexto.Entry(recibido.entrada).State = EntityState.Modified;
                         contexto.Entry(recibido.material).State = EntityState.Modified;
                         recibido.material.Cantidad -= recibido.Cantidad;
+                        recibido.material.ValorInventario = recibido.material.Cantidad*recibido.material.Costo;
                     }
                     contexto.Entry(entrada.AlmacenOrigen).State = EntityState.Modified;
                     contexto.Entry(entrada.Transportista).State = EntityState.Modified;
@@ -146,7 +153,9 @@ namespace BLL
             {
                 lista = contexto.EntradasAlmacenes
                 .Where(criterio)
+                .Include(e => e.Transportista)
                 .Include(e => e.MaterialesRecibidos)
+                .ThenInclude(e => e.material)
                 .Include(e => e.AlmacenOrigen)
                 .AsNoTracking()
                 .ToList();

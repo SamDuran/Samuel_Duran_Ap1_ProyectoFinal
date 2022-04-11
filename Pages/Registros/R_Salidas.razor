@@ -1,15 +1,15 @@
-﻿@page "/EntradasAlmacen"
-@page "/EntradasAlmacen/{EntradaId:int}"
+﻿@page "/SalidasAlmacen"
+@page "/SalidasAlmacen/{SalidaId:int}"
 
 @inject IToastService toastService
-<PageTitle>Entradas de material</PageTitle>
-<EditForm Model="entrada" OnValidSubmit="Guardar">
+<PageTitle>Salidas de material</PageTitle>
+<EditForm Model="Salida" OnValidSubmit="Guardar">
     <DataAnnotationsValidator />
     <div className="Container" style="Margin: 15px;">
         <div class="card">
 
             <div class="card-header">
-                <h3 style="text-align: center;">Entradas de materiales</h3>
+                <h3 style="text-align: center;">Salidas de materiales</h3>
             </div>
 
             <div class="card-body" style="Margin: 15px 100px 15px 100px;">
@@ -20,8 +20,8 @@
                         <div class="form-group">
                             <div class="input-group" style="margin: 22px; ">
                                 <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">ID
-                                    Entrada</span>
-                                <InputNumber @bind-Value="entrada.EntradaId" class="form-control col-4" />
+                                    Salida</span>
+                                <InputNumber @bind-Value="Salida.SalidaId" class="form-control col-4" />
                                 <div class="input-group-append">
                                     <button type="button" style="z-index: 0;" class="btn btn-primary input-group-text"
                                         @onclick="Buscar"><span class="oi oi-magnifying-glass">Buscar</span></button>
@@ -35,15 +35,15 @@
                 <div class="input-group" style="margin: 22px; ">
                     <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Fecha de
                         movimiento</span>
-                    <InputDate @bind-Value="entrada.FechaEntrada" class="form-control col-4" />
-                    <ValidationMessage For="@(() => entrada.FechaEntrada)" />
+                    <InputDate @bind-Value="Salida.FechaSalida" class="form-control col-4" />
+                    <ValidationMessage For="@(() => Salida.FechaSalida)" />
                 </div>
 
-                @* Almacen origen *@
+                @* Almacen Destino *@
                 <div class="input-group" style="margin: 22px;">
-                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Almacen origen</span>
-                    <InputSelect @bind-Value="entrada.AlmacenOrigen.AlmacenId" class="form-select text-14 col-4">
-                        <option selected hidden value="0">-- Seleccione un almacen origen --</option>
+                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Almacen Destino</span>
+                    <InputSelect @bind-Value="Salida.AlmacenDestino.AlmacenId" class="form-select text-14 col-4">
+                        <option selected hidden value="0">-- Seleccione un almacen Destino --</option>
                         @foreach (var almacen in listaAlmacenes)
                         {
                             <option value="@almacen.AlmacenId">@almacen.DenominacionCentro: @almacen.NombreCentro</option>
@@ -54,7 +54,7 @@
                 @* Transportista *@
                 <div class="input-group" style="margin: 22px;">
                     <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Transportista</span>
-                    <InputSelect @bind-Value="entrada.Transportista.TransportistaId" class="form-select text-14 col-4">
+                    <InputSelect @bind-Value="Salida.Transportista.TransportistaId" class="form-select text-14 col-4">
                         <option selected hidden value="0">-- Seleccione un transportista --</option>
                         @foreach (var transportista in listaTransportistas)
                         {
@@ -66,7 +66,7 @@
                 <div class="card">
 
                     <div class="card-header">
-                        <h3>Materiales recibidos</h3>
+                        <h3>Materiales Despachados</h3>
                     </div>
 
                     <div class="card-body">
@@ -84,11 +84,11 @@
                             </div>
                             <div class="flex-fill mx-2" style="width: 12px;">
                                 <label>Cantidad</label>
-                                <InputNumber class="form-control" @bind-Value="recibido.Cantidad" />
+                                <InputNumber class="form-control" @bind-Value="Despachado.Cantidad" />
                             </div>
                             <div class="input-group-append">
                                 <button type="button" style="z-index: 0;" class="btn btn-primary input-group-text"
-                                    @onclick="AgregarRecibido">
+                                    @onclick="AgregarDespachado">
                                     <span class="oi oi-plus"> Add</span>
                                 </button>
                             </div>
@@ -108,25 +108,25 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @foreach (var recibido in entrada.MaterialesRecibidos)
+                                @foreach (var Despachado in Salida.MaterialesDespachados)
                                 {
-                                    costoRecibido = recibido.Cantidad * recibido.material.Costo;
+                                    costoDespachado = Despachado.Cantidad * Despachado.Material.Costo;
                                     <tr>
-                                        <td>@recibido.material.MaterialId</td>
-                                        <td>@recibido.material.Descripcion</td>
-                                        <td>@recibido.Cantidad</td>
-                                        <td>@recibido.material.Costo</td>
-                                        <td>@costoRecibido</td>
+                                        <td>@Despachado.Material.MaterialId</td>
+                                        <td>@Despachado.Material.Descripcion</td>
+                                        <td>@Despachado.Cantidad</td>
+                                        <td>@Despachado.Material.Costo</td>
+                                        <td>@costoDespachado</td>
                                         <td><span class="btn btn-sm btn-outline-secondary oi oi-x"
-                                            @onclick="@(() => RemoverRecibido(recibido))"></span></td>
+                                            @onclick="@(() => RemoverDespachado(Despachado))"></span></td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                         <div Class="form-group" style="margin: 22px; width: 35%; display: right;">
                             <div class="input-group">
-                                <span class="input-group-text">Costo Total de entrada:</span>
-                                <InputNumber readonly class="form-control" @bind-Value="entrada.PrecioTotal"/>
+                                <span class="input-group-text">Costo Total de Salida:</span>
+                                <InputNumber readonly class="form-control" @bind-Value="Salida.CostoTotal"/>
                                 <span class="input-group-text">$RD</span>
                             </div>
                         </div>
@@ -151,22 +151,22 @@
 @code {
 
     [Parameter]
-    public int EntradaId { get; set; }
+    public int SalidaId { get; set; }
 
-    private decimal costoRecibido {get;set;}
+    private decimal costoDespachado {get;set;}
 
-    public Almacenes? AlmacenOrigen = new Almacenes();
+    public Almacenes? AlmacenDestino = new Almacenes();
     public Transportistas? transportista = new Transportistas();
-    public MaterialesRecibidos recibido { get; set; } = new MaterialesRecibidos();
+    public MaterialesDespachados Despachado { get; set; } = new MaterialesDespachados();
     public Materiales? material { get; set; } = new Materiales();
     public string? materialID { get; set; } ="";
-    public EntradasAlmacen entrada { get; set; } = new EntradasAlmacen();
+    public SalidasAlmacen Salida { get; set; } = new SalidasAlmacen();
     public List<Almacenes> listaAlmacenes { get; set; } = new List<Almacenes>();
     public List<Materiales> listaMateriales { get; set; } = new List<Materiales>();
     public List<Transportistas> listaTransportistas { get; set; } = new List<Transportistas>();
 
     [Inject]
-    public EntradasBLL entradasBLL { get; set; }
+    public SalidasBLL salidasBLL { get; set; }
 
     [Inject]
     public AlmacenBLL almacenBLL { get; set; }
@@ -183,67 +183,68 @@
         listaAlmacenes = almacenBLL.GetList();
         listaMateriales = materialesBLL.GetList(e => true);
         listaTransportistas = transportistasBLL.GetList(t => true);
-        entrada.EntradaId = EntradaId;
+        Salida.SalidaId = SalidaId;
         Buscar();
     }
     public void Buscar()
     {
-        if (this.entrada.EntradaId > 0)
+        if (this.Salida.SalidaId > 0)
         {
-            var encontrado = entradasBLL.Buscar(this.entrada.EntradaId);
+            var encontrado = salidasBLL.Buscar(this.Salida.SalidaId);
 
             if (encontrado != null)
-                this.entrada = encontrado;
+                this.Salida = encontrado;
             else
-                toastService.ShowError($"No se encontro un registro con {entrada.EntradaId} como ID");
+                toastService.ShowError($"No se encontro un registro con {Salida.SalidaId} como ID");
         }
     }
-    public void AgregarRecibido()
+    public void AgregarDespachado()
     {
         this.material = materialesBLL.Buscar(Utilities.ToInt(materialID));
-        this.recibido.material = (material!=null)?material: new Materiales();
+        this.Despachado.Material = (material!=null)?material: new Materiales();
+        Despachado = VerificarDespachado(Despachado);
 
-        entrada.PrecioTotal += recibido.Cantidad * recibido.material.Costo;
+        Salida.CostoTotal += Despachado.Cantidad * Despachado.Material.Costo;
 
-        bool existe = entrada.MaterialesRecibidos.Any(m => m.material.MaterialId == recibido.material.MaterialId);
+        bool existe = Salida.MaterialesDespachados.Any(m => m.Material.MaterialId == Despachado.Material.MaterialId);
 
         if (!existe)
         {
-            this.entrada.MaterialesRecibidos.Add(this.recibido);
+            this.Salida.MaterialesDespachados.Add(this.Despachado);
         }
         else
         {
-            var materialBuscado = entrada.MaterialesRecibidos.Find(m => m.material.MaterialId == recibido.material.MaterialId);
+            var materialBuscado = Salida.MaterialesDespachados.Find(m => m.Material.MaterialId == Despachado.Material.MaterialId);
             if (materialBuscado != null)
             {
-                entrada.PrecioTotal -= materialBuscado.Cantidad*recibido.material.Costo;
-                recibido.Cantidad += materialBuscado.Cantidad;
-                entrada.MaterialesRecibidos.Remove(materialBuscado);
-                entrada.MaterialesRecibidos.Add(recibido);
+                Salida.CostoTotal -= materialBuscado.Cantidad*Despachado.Material.Costo;
+                Despachado.Cantidad += materialBuscado.Cantidad;
+                Salida.MaterialesDespachados.Remove(materialBuscado);
+                Salida.MaterialesDespachados.Add(Despachado);
             }
         }
-        recibido = new MaterialesRecibidos();
+        Despachado = new MaterialesDespachados();
         material = new Materiales();
     }
-    public void RemoverRecibido(MaterialesRecibidos recibido)
+    public void RemoverDespachado(MaterialesDespachados Despachado)
     {
-        this.entrada.MaterialesRecibidos.Remove(recibido);
-        entrada.PrecioTotal -= recibido.Cantidad * recibido.material.Costo;
+        this.Salida.MaterialesDespachados.Remove(Despachado);
+        Salida.CostoTotal -= Despachado.Cantidad * Despachado.Material.Costo;
     }
     public void Guardar()
     {
-        if(EntradaValida())
+        if(SalidaValida())
         {
-            AlmacenOrigen = almacenBLL.Buscar(entrada.AlmacenOrigen.AlmacenId);
-            transportista = transportistasBLL.Buscar(entrada.Transportista.TransportistaId);
+            AlmacenDestino = almacenBLL.Buscar(Salida.AlmacenDestino.AlmacenId);
+            transportista = transportistasBLL.Buscar(Salida.Transportista.TransportistaId);
 
-            if (AlmacenOrigen != null)
-                entrada.AlmacenOrigen = AlmacenOrigen;
+            if (AlmacenDestino != null)
+                Salida.AlmacenDestino = AlmacenDestino;
 
             if(transportista != null) 
-                entrada.Transportista = transportista;
+                Salida.Transportista = transportista;
 
-            if (entradasBLL.Guardar(entrada))
+            if (salidasBLL.Guardar(Salida))
             {
                 toastService.ShowSuccess("Se guardó exitosamente");
                 Nuevo();
@@ -256,11 +257,11 @@
     }
     public void Nuevo()
     {
-        entrada = new EntradasAlmacen();
+        Salida = new SalidasAlmacen();
     }
     public void Eliminar()
     {
-        if (entradasBLL.Eliminar(entrada.EntradaId))
+        if (salidasBLL.Eliminar(Salida.SalidaId))
         {
             toastService.ShowSuccess("Eliminación Exitosa");
             Nuevo();
@@ -270,24 +271,31 @@
             toastService.ShowError("No se pudo eliminar.");
         }
     }
-    private bool EntradaValida()
+    private bool SalidaValida()
     {
         bool valido = true;
-        if(entrada.MaterialesRecibidos.Count<=0)
+        if(Salida.MaterialesDespachados.Count<=0)
         {
-            toastService.ShowError("Se debe indicar al menos un material de entrada.", "Operacion invalida");
+            toastService.ShowError("Se debe indicar al menos un material de salida.", "Operacion invalida");
             valido=false;
         }
-        if(entrada.Transportista.TransportistaId==0)
+        if(Salida.Transportista.TransportistaId==0)
         {
             toastService.ShowError("Se debe indicar un transportista.", "Operacion invalida");
             valido = false;
         }
-        if(entrada.AlmacenOrigen.AlmacenId==0)
+        if(Salida.AlmacenDestino.AlmacenId==0)
         {
-            toastService.ShowError("Se debe indicar un almacen de origen.", "Operacion invalida");
+            toastService.ShowError("Se debe indicar un almacen de destino.", "Operacion invalida");
             valido = false;
         }
         return valido;
+    }
+    private MaterialesDespachados VerificarDespachado(MaterialesDespachados Despachado)
+    {
+        if(Despachado.Cantidad>Despachado.Material.Cantidad)//si se pasa de los disponibles
+            Despachado.Cantidad=Despachado.Material.Cantidad;
+        
+        return Despachado;
     }
 }

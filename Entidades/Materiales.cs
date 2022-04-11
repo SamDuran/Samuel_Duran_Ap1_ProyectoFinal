@@ -17,15 +17,16 @@ namespace Entidades
         public string UnidadesMedida { get; set; } = "";
 
         [Required(ErrorMessage = ("Campo obligatorio. Debe indicar la cantidad del material."))]
-        [Range(0.1, 10000000, ErrorMessage ="La cantidad debe permanecer dentro de un rango de {1} a {2}.")]
+        [Range(0, 10000000, ErrorMessage ="La cantidad debe permanecer dentro de un rango de {1} a {2}.")]
         public decimal Cantidad { get; set; }
+        public decimal ValorInventario { get; set; }
 
         [Required(ErrorMessage ="Campo obligatorio. Debe indicar el costo del material.")]
         [Range(1,25000000, ErrorMessage ="El costo debe permanecer dentro de un rango de {1} a {2}.")]
         public decimal Costo {get; set;}
         
         [Required(ErrorMessage ="Campo obligatorio")]
-        public DateTime FechaRegistro { get; set; } = DateTime.Now;
+        public DateTime FechaRegistro { get; set; } = DateTime.Today;
 
     }
 }

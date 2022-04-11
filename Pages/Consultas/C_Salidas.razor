@@ -1,9 +1,9 @@
-@page "/C_Entradas"
-<PageTitle>Consulta de entradas</PageTitle>
+@page "/C_Salidas"
+<PageTitle>Consulta de Salidas</PageTitle>
 <EditForm Model="lista" OnValidSubmit="@Buscar">
     <div class="card" style="margin:30px;">
         <div class="card-header">
-            <h5 style="text-align:center;">Consulta de Entradas</h5>
+            <h5 style="text-align:center;">Consulta de Salidas</h5>
         </div>
     </div>
 
@@ -56,7 +56,7 @@
         <thead class="thead">
             <tr class="table table-light">
                 <th>ID</th>
-                <th>Fecha entrada</th>
+                <th>Fecha Salida</th>
                 <th>Cantidad Materiales</th>
                 <th>Almacen origen</th>
                 <th>Transportista</th>
@@ -69,22 +69,22 @@
             @if (lista.Count == 0)
             {
                 <span style="color:#FFFFFF; text-shadow: 1.5px 2px rgba(0, 0, 0, 0.4); margin: 20px; text-align:center">
-                    No hay entradas registradas</span>
+                    No hay Salidas registradas</span>
             }
             else
             {
                 @foreach (var item in lista)
                 {
-                    Fecha = DateOnly.FromDateTime(item.FechaEntrada);
+                    Fecha = DateOnly.FromDateTime(item.FechaSalida);
                     <tr>
-                        <td>@item.EntradaId</td>
+                        <td>@item.SalidaId</td>
                         <td>@Fecha</td>
-                        <td>@item.MaterialesRecibidos.Count</td>
-                        <td>@item.AlmacenOrigen.DenominacionCentro</td>
+                        <td>@item.MaterialesDespachados.Count</td>
+                        <td>@item.AlmacenDestino.DenominacionCentro</td>
                         <td>@item.Transportista.Nombres @item.Transportista.Apellidos</td>
                         <td>@item.Transportista.NumeroCarnet</td>
-                        <td>@item.PrecioTotal</td>
-                        <td><a class="btn btn-sm btn-outline-primary oi oi-eye" href="EntradasAlmacen/@item.EntradaId"> Ver</a>
+                        <td>@item.CostoTotal</td>
+                        <td><a class="btn btn-sm btn-outline-primary oi oi-eye" href="SalidasAlmacen/@item.SalidaId"> Ver</a>
                         </td>
                     </tr>
                 }
@@ -97,8 +97,8 @@
 @code {
 
     [Inject]
-    public EntradasBLL entradasBLL { get; set; }
-    public List<EntradasAlmacen> lista { get; set; } = new List<EntradasAlmacen>();
+    public SalidasBLL salidasBLL { get; set; }
+    public List<SalidasAlmacen> lista { get; set; } = new List<SalidasAlmacen>();
     public string? Filtro { get; set; }
     private DateOnly Fecha { get; set; }
     private string? Criterio { get; set; }
@@ -107,11 +107,11 @@
 
     protected override void OnInitialized()
     {
-        lista = entradasBLL.GetList(m => true);
+        lista = salidasBLL.GetList(m => true);
     }
     public void Buscar()
     {
-        lista = new List<EntradasAlmacen>();
+        lista = new List<SalidasAlmacen>();
         if (Criterio != null)
         {
             switch (Filtro)
@@ -120,9 +120,9 @@
                     {
                         int ID = Utilities.ToInt(Criterio);
                         if (ID == -1)
-                            lista = entradasBLL.GetList(m => m.FechaEntrada>= FechaDesde && m.FechaEntrada <= FechaHasta);
+                            lista = salidasBLL.GetList(m => m.FechaSalida>= FechaDesde && m.FechaSalida <= FechaHasta);
                         else
-                            lista = entradasBLL.GetList(m => m.EntradaId == ID && m.FechaEntrada >= FechaDesde && m.FechaEntrada <=
+                            lista = salidasBLL.GetList(m => m.SalidaId == ID && m.FechaSalida >= FechaDesde && m.FechaSalida <=
                                 FechaHasta);
                         break;
                     }
@@ -130,34 +130,34 @@
                     {
                         int CantidadElementos = Utilities.ToInt(Criterio);
                         if (CantidadElementos == -1)
-                            lista = entradasBLL.GetList(m => m.FechaEntrada >= FechaDesde && m.FechaEntrada <= FechaHasta);
+                            lista = salidasBLL.GetList(m => m.FechaSalida >= FechaDesde && m.FechaSalida <= FechaHasta);
                         else
-                            lista = entradasBLL.GetList(m => m.MaterialesRecibidos.Count == CantidadElementos 
-                                && m.FechaEntrada >= FechaDesde && m.FechaEntrada <= FechaHasta);
+                            lista = salidasBLL.GetList(m => m.MaterialesDespachados.Count == CantidadElementos 
+                                && m.FechaSalida >= FechaDesde && m.FechaSalida <= FechaHasta);
                         break;
                     }
                 case "3": //Almacen Origen
                     {
-                        lista = entradasBLL.GetList(m => m.AlmacenOrigen.DenominacionCentro.ToLower().Contains(Criterio.ToLower()) 
-                            && m.FechaEntrada >= FechaDesde && m.FechaEntrada <= FechaHasta);
+                        lista = salidasBLL.GetList(m => m.AlmacenDestino.DenominacionCentro.ToLower().Contains(Criterio.ToLower()) 
+                            && m.FechaSalida >= FechaDesde && m.FechaSalida <= FechaHasta);
 
                         break;
                     }
                 case "4": //nombre transportista
                 {
-                    lista= entradasBLL.GetList(m => m.Transportista.Nombres.ToLower().Contains(Criterio.ToLower())
-                        || m.Transportista.Apellidos.ToLower().Contains(Criterio.ToLower()) && m.FechaEntrada >= FechaDesde 
-                            && m.FechaEntrada <=FechaHasta);
+                    lista= salidasBLL.GetList(m => m.Transportista.Nombres.ToLower().Contains(Criterio.ToLower())
+                        || m.Transportista.Apellidos.ToLower().Contains(Criterio.ToLower()) && m.FechaSalida >= FechaDesde 
+                            && m.FechaSalida <=FechaHasta);
                     break;
                 }
                 case "5": //Carnet Transportista
                 {
                     int Carnet = Utilities.ToInt(Criterio);
                     if(Carnet==-1)
-                        lista = entradasBLL.GetList(m => m.FechaEntrada >= FechaDesde && m.FechaEntrada <= FechaHasta);
+                        lista = salidasBLL.GetList(m => m.FechaSalida >= FechaDesde && m.FechaSalida <= FechaHasta);
                     else
-                        lista = entradasBLL.GetList(m => m.Transportista.NumeroCarnet == Carnet 
-                            && m.FechaEntrada>= FechaDesde && m.FechaEntrada <= FechaHasta);
+                        lista = salidasBLL.GetList(m => m.Transportista.NumeroCarnet == Carnet 
+                            && m.FechaSalida>= FechaDesde && m.FechaSalida <= FechaHasta);
                     break;
                 }
                 case "6": // Precio total
@@ -165,17 +165,17 @@
 
                         decimal precio = Utilities.ToDecimal(Criterio);
                         if (precio == -1)
-                            lista = entradasBLL.GetList(m => m.FechaEntrada >= FechaDesde && m.FechaEntrada <= FechaHasta);
+                            lista = salidasBLL.GetList(m => m.FechaSalida >= FechaDesde && m.FechaSalida <= FechaHasta);
                         else
-                            lista = entradasBLL.GetList(m => m.PrecioTotal == precio && m.FechaEntrada >= FechaDesde 
-                                && m.FechaEntrada <= FechaHasta);
+                            lista = salidasBLL.GetList(m => m.CostoTotal == precio && m.FechaSalida >= FechaDesde 
+                                && m.FechaSalida <= FechaHasta);
                         break;
                     }
             }
         }
         else
         {
-            lista = entradasBLL.GetList(m => m.FechaEntrada>= FechaDesde && m.FechaEntrada <= FechaHasta);
+            lista = salidasBLL.GetList(m => m.FechaSalida>= FechaDesde && m.FechaSalida <= FechaHasta);
         }
     }
 }

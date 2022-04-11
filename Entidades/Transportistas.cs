@@ -18,10 +18,10 @@ namespace Entidades
         public string Apellidos { get; set; } = String.Empty;
 
         [Required(ErrorMessage= "Campo obligatorio.")]
-        [Range(1000, 99999,ErrorMessage="El Numero del carnet debe estar comprendido entre 1000 y 10000.")]
+        [Range(1000, 99999,ErrorMessage="El Numero del carnet debe estar comprendido entre 1000 y 100000.")]
         public int NumeroCarnet { get; set; }
         
         [Required(ErrorMessage= "Campo obligatorio.")]
-        public DateTime FechaRegistro { get; set; } = DateTime.Now;
+        public DateTime FechaRegistro { get; set; } = DateTime.Today;
     }
 }

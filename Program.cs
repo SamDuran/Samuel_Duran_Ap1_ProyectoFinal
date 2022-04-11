@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components;
 using Microsoft.EntityFrameworkCore;
 using Blazored.Toast;
 using BLL;
@@ -10,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
+
 
 /* Contexto */
 builder.Services.AddDbContext<Contexto>(options =>
@@ -22,6 +23,7 @@ builder.Services.AddTransient<TransportistasBLL>();
 builder.Services.AddTransient<MaterialesBLL>();
 builder.Services.AddTransient<EntradasBLL>();
 builder.Services.AddTransient<AlmacenBLL>();
+builder.Services.AddTransient<SalidasBLL>();
 
 
 var app = builder.Build();

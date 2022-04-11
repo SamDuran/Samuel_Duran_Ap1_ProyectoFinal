@@ -2,8 +2,8 @@
 @page "/R_Materiales/{MaterialId:int}"
 
 @inject IToastService toastService
-
-<EditForm Model="material">
+<PageTitle>Registro de Materiales</PageTitle>
+<EditForm Model="material" OnValidSubmit="@Guardar">
     <DataAnnotationsValidator />
     <div className="Container" style="Margin: 15px;">
         <div class="card">
@@ -50,8 +50,8 @@
                 @* Unidad de medida *@
                 <div class="input-group" style="margin: 22px;">
                     <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Unidad de medida</span>
-                    <InputSelect @bind-Value="material.UnidadesMedida" class="form-control col-4">
-                        <option selected hidden value="">--) Seleccione una unidad de medida (--</option>
+                    <InputSelect @bind-Value="material.UnidadesMedida" class="form-select text-14 col-4">
+                        <option selected hidden value="">-- Seleccione una unidad de medida --</option>
                         <option value="Mtrs">Metros</option>
                         <option value="Pies">Pies</option>
                         <option value="Unidad">Unidad</option>
@@ -61,15 +61,21 @@
                 @* Cantidad *@
                 <div class="input-group" style="margin: 22px;">
                     <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Cantidad</span>
-                    <InputNumber @bind-Value="material.Cantidad" class="form-control col-4"/>
+                    <InputNumber @onblur="CantidadOrCostoChanged" @bind-Value="material.Cantidad" class="form-control col-4"/>
                     <ValidationMessage For="@(() => material.Cantidad)" />
                 </div>
 
                 @* Costo *@
                 <div class="input-group" style="margin: 22px;">
                     <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Costo</span>
-                    <InputNumber @bind-Value="material.Costo" class="form-control col-4"/>
+                    <InputNumber @onblur="CantidadOrCostoChanged" @bind-Value="material.Costo" class="form-control col-4"/>
                     <ValidationMessage For="@(() => material.Costo)" />
+                </div>
+
+                @* ValorInventario *@
+                <div class="input-group" style="margin: 22px;">
+                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Valor Inventario</span>
+                    <InputNumber readonly @bind-Value="material.ValorInventario" class="form-control col-4"/>
                 </div>
 
             </div>
@@ -79,8 +85,7 @@
                 <div class="form-group text-center" style="justify-content: space-between;">
                     <button type="button" style="margin: 10px;" class="btn btn-lg btn-primary"
                         @onclick="Nuevo">Nuevo</button>
-                    <button type="button" style="margin: 10px;" class="btn btn-lg btn-success"
-                        @onclick="Guardar">Guardar</button>
+                    <button type="submit" style="margin: 10px;" class="btn btn-lg btn-success">Guardar</button>
                     <button type="button" style="margin: 10px;" class="btn btn-lg btn-danger"
                         @onclick="Eliminar">Eliminar</button>
                 </div>
@@ -114,12 +119,24 @@
                 this.material= encontrado;
         }
     }
+    private void CantidadOrCostoChanged()
+    {
+        material.ValorInventario = material.Cantidad*material.Costo;
+    }
     public void Guardar()
     {
-        if(materialesBLL.Guardar(material))
-            toastService.ShowSuccess("Se guardó exitosamente");
-        else
-            toastService.ShowError("No se pudo guardar.");
+        if(MaterialValido())
+        {
+            if(materialesBLL.Guardar(material))
+            {
+                toastService.ShowSuccess("Se guardó exitosamente");
+                Nuevo();
+            }
+            else
+            {
+                toastService.ShowError("No se pudo guardar.");
+            }
+        }
     }
     public void Nuevo()
     {
@@ -136,5 +153,27 @@
         {
             toastService.ShowError("No se pudo eliminar.");
         }
+    }
+    private bool MaterialValido()
+    {
+        bool valido = true;
+        try
+        {
+            var MaterialExistente = materialesBLL.BuscarPorDescripcion(this.material.Descripcion);
+            
+            if(MaterialExistente !=null && MaterialExistente.MaterialId != this.material.MaterialId)
+            {
+                //Si existe el material y es el mismo id, se le permite modificar
+                //Pero NO si existe y son diferentes ID
+                valido = false;
+                toastService.ShowError("El material ya existe", "Operacion invalida");
+            }
+        }
+        catch (System.Exception)
+        {
+            throw;
+        }
+
+        return valido;
     }
 }

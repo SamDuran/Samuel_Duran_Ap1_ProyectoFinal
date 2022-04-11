@@ -9,10 +9,7 @@ namespace BLL
     {
         private Contexto contexto;
 
-        public TransportistasBLL(Contexto _contexto)
-        {
-            this.contexto = _contexto;
-        }
+        public TransportistasBLL(Contexto _contexto) { this.contexto = _contexto; }
 
         private bool Existe(int id)
         {
@@ -28,6 +25,25 @@ namespace BLL
             }
             return existe;
         }
+        public Transportistas? BuscarPorCarnet(int NoCarnet)
+        {
+            Transportistas? transportista;
+
+            try
+            {
+                transportista = contexto.Transportistas
+                .Where( t => t.NumeroCarnet== NoCarnet)
+                .AsNoTracking()
+                .FirstOrDefault();
+            }
+            catch (System.Exception)
+            {
+                throw;
+            }
+
+            return transportista;
+        }
+
         public bool Guardar(Transportistas transportista)
         {
             if(Existe(transportista.TransportistaId))
@@ -74,8 +90,9 @@ namespace BLL
             try
             {
                 transportista = contexto.Transportistas
+                .Where( t => t.TransportistaId== id)
                 .AsNoTracking()
-                .FirstOrDefault( t => t.TransportistaId== id);
+                .FirstOrDefault();
             }
             catch (System.Exception)
             {

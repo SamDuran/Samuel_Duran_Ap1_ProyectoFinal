@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Samuel_Duran_Ap1_PF.Migrations
 {
     [DbContext(typeof(Contexto))]
-    [Migration("20220404181121_Inicial")]
-    partial class Inicial
+    [Migration("20220411081527_inicial")]
+    partial class inicial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -25,15 +25,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("DenominacionAlmacen")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("DenominacionCentro")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("NombreAlmacen")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
@@ -49,42 +41,50 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         new
                         {
                             AlmacenId = 1,
-                            DenominacionAlmacen = "San Francisco",
-                            DenominacionCentro = "San Francisco - Edenorte",
-                            NombreAlmacen = "N301",
-                            NombreCentro = "N300"
-                        },
-                        new
-                        {
-                            AlmacenId = 2,
-                            DenominacionAlmacen = "Santiago",
                             DenominacionCentro = "Santiago - Edenorte",
-                            NombreAlmacen = "N101",
                             NombreCentro = "N100"
                         },
                         new
                         {
+                            AlmacenId = 2,
+                            DenominacionCentro = "Samaná - Edenorte",
+                            NombreCentro = "N200"
+                        },
+                        new
+                        {
                             AlmacenId = 3,
-                            DenominacionAlmacen = "Puerto plata",
-                            DenominacionCentro = "Puerto Plata - Edenorte",
-                            NombreAlmacen = "N401",
-                            NombreCentro = "N400"
+                            DenominacionCentro = "San Francisco - Edenorte",
+                            NombreCentro = "N300"
                         },
                         new
                         {
                             AlmacenId = 4,
-                            DenominacionAlmacen = "Mao",
-                            DenominacionCentro = "Mao- Edenorte",
-                            NombreAlmacen = "N501",
-                            NombreCentro = "N500"
+                            DenominacionCentro = "Puerto Plata - Edenorte",
+                            NombreCentro = "N400"
                         },
                         new
                         {
                             AlmacenId = 5,
-                            DenominacionAlmacen = "La vega",
+                            DenominacionCentro = "Mao- Edenorte",
+                            NombreCentro = "N500"
+                        },
+                        new
+                        {
+                            AlmacenId = 6,
                             DenominacionCentro = "La vega - Edenorte",
-                            NombreAlmacen = "N601",
                             NombreCentro = "N600"
+                        },
+                        new
+                        {
+                            AlmacenId = 7,
+                            DenominacionCentro = "Espaillat - Edenorte",
+                            NombreCentro = "N700"
+                        },
+                        new
+                        {
+                            AlmacenId = 8,
+                            DenominacionCentro = "Valverde - Edenorte",
+                            NombreCentro = "N800"
                         });
                 });
 
@@ -98,11 +98,6 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("FechaEntrada")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Operario")
-                        .IsRequired()
-                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<decimal>("PrecioTotal")
@@ -144,9 +139,36 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<decimal>("ValorInventario")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("MaterialId");
 
                     b.ToTable("Materiales");
+                });
+
+            modelBuilder.Entity("Entidades.MaterialesDespachados", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("Cantidad")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("MaterialId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("SalidaId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("MaterialId");
+
+                    b.HasIndex("SalidaId");
+
+                    b.ToTable("MaterialesDespachados");
                 });
 
             modelBuilder.Entity("Entidades.MaterialesRecibidos", b =>
@@ -171,6 +193,33 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                     b.HasIndex("MaterialId");
 
                     b.ToTable("MaterialesRecibidos");
+                });
+
+            modelBuilder.Entity("Entidades.SalidasAlmacen", b =>
+                {
+                    b.Property<int>("SalidaId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("AlmacenDestinoAlmacenId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<decimal>("CostoTotal")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaSalida")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("TransportistaId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("SalidaId");
+
+                    b.HasIndex("AlmacenDestinoAlmacenId");
+
+                    b.HasIndex("TransportistaId");
+
+                    b.ToTable("SalidasAlmacen");
                 });
 
             modelBuilder.Entity("Entidades.Transportistas", b =>
@@ -219,6 +268,25 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                     b.Navigation("Transportista");
                 });
 
+            modelBuilder.Entity("Entidades.MaterialesDespachados", b =>
+                {
+                    b.HasOne("Entidades.Materiales", "Material")
+                        .WithMany()
+                        .HasForeignKey("MaterialId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entidades.SalidasAlmacen", "Salida")
+                        .WithMany("MaterialesDespachados")
+                        .HasForeignKey("SalidaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Material");
+
+                    b.Navigation("Salida");
+                });
+
             modelBuilder.Entity("Entidades.MaterialesRecibidos", b =>
                 {
                     b.HasOne("Entidades.EntradasAlmacen", "entrada")
@@ -238,9 +306,33 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                     b.Navigation("material");
                 });
 
+            modelBuilder.Entity("Entidades.SalidasAlmacen", b =>
+                {
+                    b.HasOne("Entidades.Almacenes", "AlmacenDestino")
+                        .WithMany()
+                        .HasForeignKey("AlmacenDestinoAlmacenId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Entidades.Transportistas", "Transportista")
+                        .WithMany()
+                        .HasForeignKey("TransportistaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AlmacenDestino");
+
+                    b.Navigation("Transportista");
+                });
+
             modelBuilder.Entity("Entidades.EntradasAlmacen", b =>
                 {
                     b.Navigation("MaterialesRecibidos");
+                });
+
+            modelBuilder.Entity("Entidades.SalidasAlmacen", b =>
+                {
+                    b.Navigation("MaterialesDespachados");
                 });
 #pragma warning restore 612, 618
         }
