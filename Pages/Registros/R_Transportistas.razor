@@ -2,93 +2,109 @@
 @page "/R_Transportistas/{TransportistaID:int}"
 
 @inject IToastService toastService
+@inject TransportistasBLL transportistaBLL
 <PageTitle>Registro de Transportistas</PageTitle>
-<EditForm Model="transportista" OnValidSubmit="Guardar">
-    <DataAnnotationsValidator />
-    <div className="Container" style="Margin: 15px;">
-        <div class="card">
+@if(isLoading)
+{
+    <div class="Loader-Container">
+        <div class="Loader"/>
+        <div class="Loader2"/>
+    </div>
+}else
+{
 
-            <div class="card-header">
-                <h3 style="text-align: center;">Registro de transportistas</h3>
-            </div>
+    <EditForm Model="transportista" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+        <div className="Container" style="Margin: 20px;">
+            <div class="card">
 
-            <div class="card-body" style="Margin: 20px 100px 20px 100px;">
+                <div class="card-header">
+                    <h3 style="text-align: center;">Registro de transportistas</h3>
+                </div>
 
-                @* ID *@
-                <div class="form-row align-items-center">
-                    <div class="col">
-                        <div class="form-group">
-                            <div class="input-group" style="margin: 22px; ">
-                                <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">ID Transportista</span>
-                                <InputNumber @bind-Value="transportista.TransportistaId" class="form-control col-4" />
-                                <ValidationMessage For="@(() => transportista.TransportistaId)" />
-                                <div class="input-group-append">
-                                    <button type="button" style="z-index: 0;" class="btn btn-primary input-group-text"
-                                        @onclick="Buscar"><span class="oi oi-magnifying-glass">Buscar</span></button>
+                <div class="card-body" style="Margin: 20px 100px 20px 100px;">
+
+                    @* ID *@
+                    <div class="form-row align-items-center">
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="input-group" style="margin: 22px; ">
+                                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">ID Transportista</span>
+                                    <InputNumber @bind-Value="transportista.TransportistaId" class="form-control col-4" />
+                                    <ValidationMessage For="@(() => transportista.TransportistaId)" />
+                                    <div class="input-group-append">
+                                        <button type="button" style="z-index: 0;" class="btn btn-primary input-group-text"
+                                            @onclick="Buscar"><span class="oi oi-magnifying-glass">Buscar</span></button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    @* Fecha registro *@
+                    <div class="input-group" style="margin: 22px; ">
+                        <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Fecha Registro</span>
+                        <InputDate @bind-Value="transportista.FechaRegistro" class="form-control col-4" />
+                    </div>
+
+                    @* Nombres *@
+                    <div class="input-group" style="margin: 22px; ">
+                        <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Nombres</span>
+                        <InputText @bind-Value="transportista.Nombres" class="form-control col-4" 
+                            placeholder="(Ejemplo: 'Juan Steven')"/>
+                            <ValidationMessage For="@(() => transportista.Nombres)"/>
+                    </div>
+
+                    @* Apellidos *@
+                    <div class="input-group" style="margin: 22px; ">
+                        <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Apellidos</span>
+                        <InputText @bind-Value="transportista.Apellidos" class="form-control col-4" 
+                            placeholder="(Ejemplo: 'Perez Mart&iacute;nez')"/>
+                            <ValidationMessage For="@(() => transportista.Apellidos)"/>
+                    </div>
+
+                    @* No.Carnet *@
+                    <div class="input-group" style="margin: 22px; ">
+                        <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">No.Carnet</span>
+                        <InputNumber @bind-Value="transportista.NumeroCarnet" class="form-control col-4"/>
+                        <ValidationMessage For="@(() => transportista.NumeroCarnet)"/>
+                    </div>
                 </div>
 
-                @* Fecha registro *@
-                <div class="input-group" style="margin: 22px; ">
-                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Fecha Registro</span>
-                    <InputDate @bind-Value="transportista.FechaRegistro" class="form-control col-4" />
-                </div>
-
-                @* Nombres *@
-                <div class="input-group" style="margin: 22px; ">
-                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Nombres</span>
-                    <InputText @bind-Value="transportista.Nombres" class="form-control col-4" 
-                        placeholder="(Ejemplo: 'Juan Steven')"/>
-                        <ValidationMessage For="@(() => transportista.Nombres)"/>
-                </div>
-
-                @* Apellidos *@
-                <div class="input-group" style="margin: 22px; ">
-                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Apellidos</span>
-                    <InputText @bind-Value="transportista.Apellidos" class="form-control col-4" 
-                        placeholder="(Ejemplo: 'Perez Mart&iacute;nez')"/>
-                        <ValidationMessage For="@(() => transportista.Apellidos)"/>
-                </div>
-
-                @* No.Carnet *@
-                <div class="input-group" style="margin: 22px; ">
-                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">No.Carnet</span>
-                    <InputNumber @bind-Value="transportista.NumeroCarnet" class="form-control col-4"/>
-                    <ValidationMessage For="@(() => transportista.NumeroCarnet)"/>
-                </div>
-            </div>
-
-            <div class="card-footer">
-                @* Botones *@
-                <div class="form-group text-center" style="justify-content: space-between;">
-                    <button type="button" style="margin: 10px;" class="btn btn-lg btn-primary"
-                        @onclick="Nuevo">Nuevo</button>
-                    <button type="submit" style="margin: 10px;" class="btn btn-lg btn-success"
-                        >Guardar</button>
-                    <button type="button" style="margin: 10px;" class="btn btn-lg btn-danger"
-                        @onclick="Eliminar">Eliminar</button>
+                <div class="card-footer">
+                    @* Botones *@
+                    <div class="form-group text-center" style="justify-content: space-between;">
+                        <div class="input-group-append" style="display: inline-block;">
+                            <button type="button" style="margin: 10px;" class="btn btn-lg btn-primary"
+                                @onclick="Nuevo"><span class="oi oi-sun"></span> Nuevo</button>
+                        </div>
+                        <div class="input-group-append" style="display: inline-block;">
+                            <button type="submit" style="margin: 10px;" class="btn btn-lg btn-success"
+                                ><span class="oi oi-circle-check"></span> Guardar</button>
+                        </div>
+                        <div class="input-group-append" style="display: inline-block;">
+                            <button type="button" style="margin: 10px;" class="btn btn-lg btn-danger"
+                                @onclick="Eliminar"><span class="oi oi-trash"></span> Eliminar</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</EditForm>
-
+    </EditForm>
+}
 @code {
 
     [Parameter]
     public int TransportistaID { get; set; }
     public Transportistas transportista { get; set; } = new Transportistas();
-
-    [Inject]
-    public TransportistasBLL transportistaBLL { get; set; }
+    private bool isLoading {get;set;} = true;
+    
 
     protected override void OnInitialized()
     {
         transportista.TransportistaId = TransportistaID;
         Buscar();
+        isLoading = false; 
     }
     public void Buscar()
     {

@@ -9,7 +9,7 @@ namespace Entidades
 
         [Required(ErrorMessage = "Campo obligatorio. Debe indicar la descripción.")]
         [MinLength(3, ErrorMessage = "La descripción debe tener al menos {1} caractéres.")]
-        [MaxLength(35, ErrorMessage = "La descripción no debe pasar de {1} caractéres.")]
+        [MaxLength(50, ErrorMessage = "La descripción no debe pasar de {1} caractéres.")]
         public string Descripcion { get; set; } ="";
 
 
@@ -30,3 +30,4 @@ namespace Entidades
 
     }
 }
+

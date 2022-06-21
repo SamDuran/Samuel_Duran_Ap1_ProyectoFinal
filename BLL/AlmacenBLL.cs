@@ -14,10 +14,8 @@ namespace BLL
 
             try
             {
-                almacen = contexto.Almacenes
-                .Where(a => a.AlmacenId == id)
-                .AsNoTracking()
-                .SingleOrDefault();
+                almacen = contexto.Almacenes.AsNoTracking()
+                .FirstOrDefault(a => a.AlmacenId==id);
             }
             catch (System.Exception)
             {

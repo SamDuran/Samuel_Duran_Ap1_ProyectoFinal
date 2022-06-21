@@ -2,157 +2,172 @@
 @page "/SalidasAlmacen/{SalidaId:int}"
 
 @inject IToastService toastService
+@inject SalidasBLL salidasBLL
+@inject AlmacenBLL almacenBLL
+@inject MaterialesBLL materialesBLL
+@inject TransportistasBLL transportistasBLL
+
 <PageTitle>Salidas de material</PageTitle>
-<EditForm Model="Salida" OnValidSubmit="Guardar">
-    <DataAnnotationsValidator />
-    <div className="Container" style="Margin: 15px;">
-        <div class="card">
+@if(isLoading)
+{
+    <div class="Loader-Container">
+        <div class="Loader"/>
+        <div class="Loader2"/>
+    </div>
+}else
+{
 
-            <div class="card-header">
-                <h3 style="text-align: center;">Salidas de materiales</h3>
-            </div>
+    <EditForm Model="Salida" OnValidSubmit="Guardar">
+        <DataAnnotationsValidator />
+        <div className="Container" style="Margin: 15px;">
+            <div class="card">
 
-            <div class="card-body" style="Margin: 15px 100px 15px 100px;">
+                <div class="card-header">
+                    <h3 style="text-align: center;">Salidas de materiales</h3>
+                </div>
 
-                @* ID *@
-                <div class="form-row align-items-center">
-                    <div class="col">
-                        <div class="form-group">
-                            <div class="input-group" style="margin: 22px; ">
-                                <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">ID
-                                    Salida</span>
-                                <InputNumber @bind-Value="Salida.SalidaId" class="form-control col-4" />
+                <div class="card-body" style="Margin: 15px 100px 15px 100px;">
+
+                    @* ID *@
+                    <div class="form-row align-items-center">
+                        <div class="col">
+                            <div class="form-group">
+                                <div class="input-group" style="margin-top: 18px; margin-bottom: 18px;">
+                                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">ID
+                                        Salida</span>
+                                    <InputNumber @bind-Value="Salida.SalidaId" class="form-control col-4" />
+                                    <div class="input-group-append">
+                                        <button type="button" style="z-index: 0;" class="btn btn-primary input-group-text"
+                                            @onclick="Buscar"><span class="oi oi-magnifying-glass">Buscar</span></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Fecha registro *@
+                    <div class="input-group" style="margin-top: 18px; margin-bottom: 18px;">
+                        <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Fecha de
+                            movimiento</span>
+                        <InputDate @bind-Value="Salida.FechaSalida" class="form-control col-4" />
+                        <ValidationMessage For="@(() => Salida.FechaSalida)" />
+                    </div>
+
+                    @* Almacen Destino *@
+                    <div class="input-group" style="margin-top: 18px; margin-bottom: 18px;">
+                        <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Almacen Destino</span>
+                        <InputSelect @bind-Value="Salida.AlmacenDestino.AlmacenId" class="form-select text-14 col-4">
+                            <option selected hidden value="0">-- Seleccione un almacen Destino --</option>
+                            @foreach (var almacen in listaAlmacenes)
+                            {
+                                <option value="@almacen.AlmacenId">@almacen.DenominacionCentro: @almacen.NombreCentro</option>
+                            }
+                        </InputSelect>
+                    </div>
+
+                    @* Transportista *@
+                    <div class="input-group" style="margin-top: 18px; margin-bottom: 18px;">
+                        <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Transportista</span>
+                        <InputSelect @bind-Value="Salida.Transportista.TransportistaId" class="form-select text-14 col-4">
+                            <option selected hidden value="0">-- Seleccione un transportista --</option>
+                            @foreach (var transportista in listaTransportistas)
+                            {
+                                <option value="@transportista.TransportistaId">@transportista.Nombres @transportista.Apellidos</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    @* subcard Materiales *@
+                    <div class="card">
+
+                        <div class="card-header">
+                            <h3>Materiales Despachados</h3>
+                        </div>
+
+                        <div class="card-body">
+                            <div class="input-group d-flex align-items-end">
+                                <div class="flex-fill mx-2">
+                                    <label>Material</label>
+                                    <InputSelect @bind-Value="materialID" class="form-select text-14">
+                                        <option value="" selected="selected" disabled="disabled" hidden="hidden">
+                                            -- Seleccione un material --</option>
+                                        @foreach (var item in listaMateriales)
+                                        {
+                                            <option value="@item.MaterialId.ToString()">@item.Descripcion (Cantidad: @item.Cantidad @item.UnidadesMedida)</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <div class="flex-fill mx-2" style="width: 12px;">
+                                    <label>Cantidad</label>
+                                    <InputNumber class="form-control" @bind-Value="Despachado.Cantidad" />
+                                </div>
                                 <div class="input-group-append">
                                     <button type="button" style="z-index: 0;" class="btn btn-primary input-group-text"
-                                        @onclick="Buscar"><span class="oi oi-magnifying-glass">Buscar</span></button>
+                                        @onclick="AgregarDespachado">
+                                        <span class="oi oi-plus"> Add</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            @* Tabla de detalles *@
+                            <table class="table t">
+                                <thead class="thead">
+                                    <tr class="table">
+                                        <th>ID Material</th>
+                                        <th>Descripci&oacute;n</th>
+                                        <th>Cantidad</th>
+                                        <th>Costo material</th>
+                                        <th>Costo Total</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var Despachado in Salida.MaterialesDespachados)
+                                    {
+                                        costoDespachado = Despachado.Cantidad * Despachado.Material.Costo;
+                                        <tr>
+                                            <td>@Despachado.Material.MaterialId</td>
+                                            <td>@Despachado.Material.Descripcion</td>
+                                            <td>@Despachado.Cantidad</td>
+                                            <td>@Despachado.Material.Costo</td>
+                                            <td>@costoDespachado</td>
+                                            <td><span class="btn btn-sm btn-outline-secondary oi oi-x"
+                                                @onclick="@(() => RemoverDespachado(Despachado))"></span></td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                            <div Class="form-group" style="margin: 22px; width: 35%; display: right;">
+                                <div class="input-group">
+                                    <span class="input-group-text">Costo Total de Salida:</span>
+                                    <InputNumber readonly class="form-control" @bind-Value="Salida.CostoTotal"/>
+                                    <span class="input-group-text">$RD</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                @* Fecha registro *@
-                <div class="input-group" style="margin: 22px; ">
-                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Fecha de
-                        movimiento</span>
-                    <InputDate @bind-Value="Salida.FechaSalida" class="form-control col-4" />
-                    <ValidationMessage For="@(() => Salida.FechaSalida)" />
-                </div>
-
-                @* Almacen Destino *@
-                <div class="input-group" style="margin: 22px;">
-                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Almacen Destino</span>
-                    <InputSelect @bind-Value="Salida.AlmacenDestino.AlmacenId" class="form-select text-14 col-4">
-                        <option selected hidden value="0">-- Seleccione un almacen Destino --</option>
-                        @foreach (var almacen in listaAlmacenes)
-                        {
-                            <option value="@almacen.AlmacenId">@almacen.DenominacionCentro: @almacen.NombreCentro</option>
-                        }
-                    </InputSelect>
-                </div>
-
-                @* Transportista *@
-                <div class="input-group" style="margin: 22px;">
-                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Transportista</span>
-                    <InputSelect @bind-Value="Salida.Transportista.TransportistaId" class="form-select text-14 col-4">
-                        <option selected hidden value="0">-- Seleccione un transportista --</option>
-                        @foreach (var transportista in listaTransportistas)
-                        {
-                            <option value="@transportista.TransportistaId">@transportista.Nombres @transportista.Apellidos</option>
-                        }
-                    </InputSelect>
-                </div>
-                @* subcard Materiales *@
-                <div class="card">
-
-                    <div class="card-header">
-                        <h3>Materiales Despachados</h3>
+                <div class="card-footer">
+                    @* Botones *@
+                    <div class="form-group text-center" style="justify-content: space-between;">
+                        <button type="button" style="margin: 10px;" class="btn btn-lg btn-primary"
+                            @onclick="Nuevo">Nuevo</button>
+                        <button type="submit" style="margin: 10px;" class="btn btn-lg btn-success">Guardar</button>
+                        <button type="button" style="margin: 10px;" class="btn btn-lg btn-danger"
+                            @onclick="Eliminar">Eliminar</button>
                     </div>
-
-                    <div class="card-body">
-                        <div class="input-group d-flex align-items-end">
-                            <div class="flex-fill mx-2">
-                                <label>Material</label>
-                                <InputSelect @bind-Value="materialID" class="form-select text-14">
-                                    <option value="" selected="selected" disabled="disabled" hidden="hidden">
-                                        -- Seleccione un material --</option>
-                                    @foreach (var item in listaMateriales)
-                                    {
-                                        <option value="@item.MaterialId.ToString()">@item.Descripcion (Cantidad: @item.Cantidad @item.UnidadesMedida)</option>
-                                    }
-                                </InputSelect>
-                            </div>
-                            <div class="flex-fill mx-2" style="width: 12px;">
-                                <label>Cantidad</label>
-                                <InputNumber class="form-control" @bind-Value="Despachado.Cantidad" />
-                            </div>
-                            <div class="input-group-append">
-                                <button type="button" style="z-index: 0;" class="btn btn-primary input-group-text"
-                                    @onclick="AgregarDespachado">
-                                    <span class="oi oi-plus"> Add</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer">
-                        @* Tabla de detalles *@
-                        <table class="table t">
-                            <thead class="thead">
-                                <tr class="table">
-                                    <th>ID Material</th>
-                                    <th>Descripci&oacute;n</th>
-                                    <th>Cantidad</th>
-                                    <th>Costo material</th>
-                                    <th>Costo Total</th>
-                                    <th></th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var Despachado in Salida.MaterialesDespachados)
-                                {
-                                    costoDespachado = Despachado.Cantidad * Despachado.Material.Costo;
-                                    <tr>
-                                        <td>@Despachado.Material.MaterialId</td>
-                                        <td>@Despachado.Material.Descripcion</td>
-                                        <td>@Despachado.Cantidad</td>
-                                        <td>@Despachado.Material.Costo</td>
-                                        <td>@costoDespachado</td>
-                                        <td><span class="btn btn-sm btn-outline-secondary oi oi-x"
-                                            @onclick="@(() => RemoverDespachado(Despachado))"></span></td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                        <div Class="form-group" style="margin: 22px; width: 35%; display: right;">
-                            <div class="input-group">
-                                <span class="input-group-text">Costo Total de Salida:</span>
-                                <InputNumber readonly class="form-control" @bind-Value="Salida.CostoTotal"/>
-                                <span class="input-group-text">$RD</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card-footer">
-                @* Botones *@
-                <div class="form-group text-center" style="justify-content: space-between;">
-                    <button type="button" style="margin: 10px;" class="btn btn-lg btn-primary"
-                        @onclick="Nuevo">Nuevo</button>
-                    <button type="submit" style="margin: 10px;" class="btn btn-lg btn-success">Guardar</button>
-                    <button type="button" style="margin: 10px;" class="btn btn-lg btn-danger"
-                        @onclick="Eliminar">Eliminar</button>
                 </div>
             </div>
         </div>
-    </div>
-</EditForm>
+    </EditForm>
+}
 
 @code {
 
     [Parameter]
     public int SalidaId { get; set; }
-
+    private bool isLoading {get;set;}= false;
     private decimal costoDespachado {get;set;}
 
     public Almacenes? AlmacenDestino = new Almacenes();
@@ -165,18 +180,6 @@
     public List<Materiales> listaMateriales { get; set; } = new List<Materiales>();
     public List<Transportistas> listaTransportistas { get; set; } = new List<Transportistas>();
 
-    [Inject]
-    public SalidasBLL salidasBLL { get; set; }
-
-    [Inject]
-    public AlmacenBLL almacenBLL { get; set; }
-
-    [Inject]
-    public MaterialesBLL materialesBLL { get; set; }
-
-    [Inject]
-    public TransportistasBLL transportistasBLL { get; set; }
-
 
     protected override void OnInitialized()
     {
@@ -185,6 +188,7 @@
         listaTransportistas = transportistasBLL.GetList(t => true);
         Salida.SalidaId = SalidaId;
         Buscar();
+        isLoading=false;
     }
     public void Buscar()
     {

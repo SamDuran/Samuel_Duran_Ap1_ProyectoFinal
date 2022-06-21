@@ -24,12 +24,28 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "EntradasAlmacenes",
+                columns: table => new
+                {
+                    EntradaId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FechaEntrada = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    TransportistaId = table.Column<int>(type: "INTEGER", nullable: false),
+                    AlmacenId = table.Column<int>(type: "INTEGER", nullable: false),
+                    PrecioTotal = table.Column<decimal>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_EntradasAlmacenes", x => x.EntradaId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Materiales",
                 columns: table => new
                 {
                     MaterialId = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Descripcion = table.Column<string>(type: "TEXT", maxLength: 35, nullable: false),
+                    Descripcion = table.Column<string>(type: "TEXT", maxLength: 50, nullable: false),
                     UnidadesMedida = table.Column<string>(type: "TEXT", nullable: false),
                     Cantidad = table.Column<decimal>(type: "TEXT", nullable: false),
                     ValorInventario = table.Column<decimal>(type: "TEXT", nullable: false),
@@ -58,30 +74,23 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EntradasAlmacenes",
+                name: "MaterialesRecibidos",
                 columns: table => new
                 {
-                    EntradaId = table.Column<int>(type: "INTEGER", nullable: false)
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    FechaEntrada = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    TransportistaId = table.Column<int>(type: "INTEGER", nullable: false),
-                    AlmacenOrigenAlmacenId = table.Column<int>(type: "INTEGER", nullable: false),
-                    PrecioTotal = table.Column<decimal>(type: "TEXT", nullable: false)
+                    Cantidad = table.Column<decimal>(type: "TEXT", nullable: false),
+                    EntradasAlmacenEntradaId = table.Column<int>(type: "INTEGER", nullable: false),
+                    MaterialId = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EntradasAlmacenes", x => x.EntradaId);
+                    table.PrimaryKey("PK_MaterialesRecibidos", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_EntradasAlmacenes_Almacenes_AlmacenOrigenAlmacenId",
-                        column: x => x.AlmacenOrigenAlmacenId,
-                        principalTable: "Almacenes",
-                        principalColumn: "AlmacenId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EntradasAlmacenes_Transportistas_TransportistaId",
-                        column: x => x.TransportistaId,
-                        principalTable: "Transportistas",
-                        principalColumn: "TransportistaId",
+                        name: "FK_MaterialesRecibidos_EntradasAlmacenes_EntradasAlmacenEntradaId",
+                        column: x => x.EntradasAlmacenEntradaId,
+                        principalTable: "EntradasAlmacenes",
+                        principalColumn: "EntradaId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -110,33 +119,6 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         column: x => x.TransportistaId,
                         principalTable: "Transportistas",
                         principalColumn: "TransportistaId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "MaterialesRecibidos",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Cantidad = table.Column<decimal>(type: "TEXT", nullable: false),
-                    EntradaId = table.Column<int>(type: "INTEGER", nullable: false),
-                    MaterialId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_MaterialesRecibidos", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_MaterialesRecibidos_EntradasAlmacenes_EntradaId",
-                        column: x => x.EntradaId,
-                        principalTable: "EntradasAlmacenes",
-                        principalColumn: "EntradaId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_MaterialesRecibidos_Materiales_MaterialId",
-                        column: x => x.MaterialId,
-                        principalTable: "Materiales",
-                        principalColumn: "MaterialId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -207,15 +189,35 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                 columns: new[] { "AlmacenId", "DenominacionCentro", "NombreCentro" },
                 values: new object[] { 8, "Valverde - Edenorte", "N800" });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_EntradasAlmacenes_AlmacenOrigenAlmacenId",
-                table: "EntradasAlmacenes",
-                column: "AlmacenOrigenAlmacenId");
+            migrationBuilder.InsertData(
+                table: "Materiales",
+                columns: new[] { "MaterialId", "Cantidad", "Costo", "Descripcion", "FechaRegistro", "UnidadesMedida", "ValorInventario" },
+                values: new object[] { 1, 0m, 200.00m, "Poste Hormigón", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Unidad", 0.00m });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_EntradasAlmacenes_TransportistaId",
-                table: "EntradasAlmacenes",
-                column: "TransportistaId");
+            migrationBuilder.InsertData(
+                table: "Materiales",
+                columns: new[] { "MaterialId", "Cantidad", "Costo", "Descripcion", "FechaRegistro", "UnidadesMedida", "ValorInventario" },
+                values: new object[] { 2, 2m, 300.00m, "Cable Cobre", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Metros", 600.00m });
+
+            migrationBuilder.InsertData(
+                table: "Materiales",
+                columns: new[] { "MaterialId", "Cantidad", "Costo", "Descripcion", "FechaRegistro", "UnidadesMedida", "ValorInventario" },
+                values: new object[] { 3, 0m, 30.00m, "Tornillo", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Unidad", 0.00m });
+
+            migrationBuilder.InsertData(
+                table: "Transportistas",
+                columns: new[] { "TransportistaId", "Apellidos", "FechaRegistro", "Nombres", "NumeroCarnet" },
+                values: new object[] { 1, "Perez", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Juan Steven", 1000 });
+
+            migrationBuilder.InsertData(
+                table: "Transportistas",
+                columns: new[] { "TransportistaId", "Apellidos", "FechaRegistro", "Nombres", "NumeroCarnet" },
+                values: new object[] { 2, "Duran", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Samuel", 1001 });
+
+            migrationBuilder.InsertData(
+                table: "Transportistas",
+                columns: new[] { "TransportistaId", "Apellidos", "FechaRegistro", "Nombres", "NumeroCarnet" },
+                values: new object[] { 3, "Perez", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Juan", 1002 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_MaterialesDespachados_MaterialId",
@@ -228,14 +230,9 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                 column: "SalidaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_MaterialesRecibidos_EntradaId",
+                name: "IX_MaterialesRecibidos_EntradasAlmacenEntradaId",
                 table: "MaterialesRecibidos",
-                column: "EntradaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_MaterialesRecibidos_MaterialId",
-                table: "MaterialesRecibidos",
-                column: "MaterialId");
+                column: "EntradasAlmacenEntradaId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SalidasAlmacen_AlmacenDestinoAlmacenId",
@@ -257,13 +254,13 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                 name: "MaterialesRecibidos");
 
             migrationBuilder.DropTable(
+                name: "Materiales");
+
+            migrationBuilder.DropTable(
                 name: "SalidasAlmacen");
 
             migrationBuilder.DropTable(
                 name: "EntradasAlmacenes");
-
-            migrationBuilder.DropTable(
-                name: "Materiales");
 
             migrationBuilder.DropTable(
                 name: "Almacenes");

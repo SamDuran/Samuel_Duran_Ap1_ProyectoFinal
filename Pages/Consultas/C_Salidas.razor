@@ -1,5 +1,14 @@
 @page "/C_Salidas"
+
+@inject IToastService toastService
+@inject EntradasBLL entradasBLL
+@inject SalidasBLL salidasBLL
+@inject AlmacenBLL almacenBLL
+@inject MaterialesBLL materialesBLL
+@inject TransportistasBLL transportistasBLL
+
 <PageTitle>Consulta de Salidas</PageTitle>
+
 <EditForm Model="lista" OnValidSubmit="@Buscar">
     <div class="card" style="margin:30px;">
         <div class="card-header">
@@ -96,8 +105,6 @@
 
 @code {
 
-    [Inject]
-    public SalidasBLL salidasBLL { get; set; }
     public List<SalidasAlmacen> lista { get; set; } = new List<SalidasAlmacen>();
     public string? Filtro { get; set; }
     private DateOnly Fecha { get; set; }

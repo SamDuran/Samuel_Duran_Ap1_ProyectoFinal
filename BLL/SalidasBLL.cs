@@ -16,13 +16,12 @@ namespace BLL
 
             try
             {
-                salidaBuscada = contexto.SalidasAlmacen
+                salidaBuscada = contexto.SalidasAlmacen.AsNoTracking()
                 .Where(s => s.SalidaId==id)
-                .Include(s=>s.AlmacenDestino)
-                .Include(s => s.Transportista)
                 .Include(s => s.MaterialesDespachados)
-                .ThenInclude(d => d.Material)
-                .AsNoTracking()
+                .ThenInclude(d => d.Material).AsNoTracking()
+                .Include(s=>s.AlmacenDestino).AsNoTracking()
+                .Include(s => s.Transportista).AsNoTracking()
                 .FirstOrDefault();
             }
             catch (System.Exception)
@@ -62,6 +61,7 @@ namespace BLL
                 {
                     contexto.Entry(despachado.Material).State = EntityState.Modified;
                     contexto.Entry(despachado).State = EntityState.Added;
+
                     despachado.Material.Cantidad-= despachado.Cantidad;
                     despachado.Material.ValorInventario = despachado.Material.Cantidad*despachado.Material.Costo;
                 }
@@ -81,13 +81,12 @@ namespace BLL
             try
             {
                 var SalidaAnterior = contexto.SalidasAlmacen
-                .Where(s => s.SalidaId == salidaModificada.SalidaId)
-                .Include(s => s.AlmacenDestino)
-                .Include(s => s.Transportista)
                 .Include(s => s.MaterialesDespachados)
-                .ThenInclude(s => s.Material)
-                .AsNoTracking()
-                .SingleOrDefault();
+                .ThenInclude(s => s.Material).AsNoTracking()
+                .Include(s => s.AlmacenDestino).AsNoTracking()
+                .Include(s => s.Transportista).AsNoTracking()
+                .Where(s => s.SalidaId == salidaModificada.SalidaId)
+                .AsNoTracking().SingleOrDefault();
 
                 if(SalidaAnterior!=null)
                 {
@@ -152,9 +151,9 @@ namespace BLL
             try
             {
                 lista=contexto.SalidasAlmacen
-                .Include(s => s.AlmacenDestino)
-                .Include(s =>s.Transportista)
-                .Include(s =>s.MaterialesDespachados).ThenInclude(s =>s.Material)
+                .Include(s => s.AlmacenDestino).AsNoTracking()
+                .Include(s =>s.Transportista).AsNoTracking()
+                .Include(s =>s.MaterialesDespachados).ThenInclude(s =>s.Material).AsNoTracking()
                 .Where(criterio)
                 .AsNoTracking()
                 .ToList();

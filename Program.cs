@@ -14,7 +14,7 @@ builder.Services.AddServerSideBlazor();
 
 /* Contexto */
 builder.Services.AddDbContext<Contexto>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("ConStr"))
+    options.EnableSensitiveDataLogging().UseSqlite(builder.Configuration.GetConnectionString("ConStr"))
 );
 /* Blazored Toast */
 builder.Services.AddBlazoredToast();

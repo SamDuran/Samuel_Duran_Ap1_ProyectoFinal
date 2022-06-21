@@ -1,5 +1,10 @@
 ﻿@page "/C_Materiales"
+
+
+@inject MaterialesBLL materialesBLL
+
 <PageTitle>Consulta de Materiales</PageTitle>
+
 <EditForm Model="lista" OnValidSubmit="@Buscar">
     <div class="card" style="margin:30px;">
         <div class="card-header">
@@ -95,9 +100,6 @@
 
 
 @code {
-
-    [Inject]
-    public MaterialesBLL materialesBLL { get; set; }
     public List<Materiales> lista { get; set; } = new List<Materiales>();
     public string? Filtro { get; set; }
     private DateOnly Fecha { get; set; }

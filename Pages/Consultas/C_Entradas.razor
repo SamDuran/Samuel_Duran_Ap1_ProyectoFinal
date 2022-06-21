@@ -1,5 +1,12 @@
 @page "/C_Entradas"
+
+@inject IToastService toastService
+@inject EntradasBLL entradasBLL
+@inject AlmacenBLL almacenBLL
+@inject TransportistasBLL transportistaBLL
+
 <PageTitle>Consulta de entradas</PageTitle>
+
 <EditForm Model="lista" OnValidSubmit="@Buscar">
     <div class="card" style="margin:30px;">
         <div class="card-header">
@@ -39,8 +46,8 @@
                 @* TextBox Busqueda *@
                 <div class="flex-fill mx-2">
                     <div class="input-group">
-                        <span class="input-group-text">Busqueda</span>
-                        <InputText class="form-control" @bind-Value="Criterio" />
+                        <span class="input-group-text">B&uacute;squeda</span>
+                        <input type="text" id="TextBusqueda" class="form-control" @bind-value="Criterio" />
                     </div>
                 </div>
 
@@ -76,17 +83,22 @@
                 @foreach (var item in lista)
                 {
                     Fecha = DateOnly.FromDateTime(item.FechaEntrada);
-                    <tr>
-                        <td>@item.EntradaId</td>
-                        <td>@Fecha</td>
-                        <td>@item.MaterialesRecibidos.Count</td>
-                        <td>@item.AlmacenOrigen.DenominacionCentro</td>
-                        <td>@item.Transportista.Nombres @item.Transportista.Apellidos</td>
-                        <td>@item.Transportista.NumeroCarnet</td>
-                        <td>@item.PrecioTotal</td>
-                        <td><a class="btn btn-sm btn-outline-primary oi oi-eye" href="EntradasAlmacen/@item.EntradaId"> Ver</a>
-                        </td>
-                    </tr>
+                    almacen= almacenBLL.Buscar(item.AlmacenId);
+                    transportista= transportistaBLL.Buscar(item.TransportistaId);
+                    @if(almacen != null && transportista != null)
+                    {
+                        <tr>
+                            <td>@item.EntradaId</td>
+                            <td>@Fecha</td>
+                            <td>@item.MaterialesRecibidos.Count</td>
+                            <td>@almacen.DenominacionCentro</td>
+                            <td>@transportista.Nombres @transportista.Apellidos</td>
+                            <td>@transportista.NumeroCarnet</td>
+                            <td>@item.PrecioTotal</td>
+                            <td><a class="btn btn-sm btn-outline-primary oi oi-eye" href="EntradasAlmacen/@item.EntradaId"> Ver</a>
+                            </td>
+                        </tr>
+                    }
                 }
             }
         </tbody>
@@ -96,14 +108,15 @@
 
 @code {
 
-    [Inject]
-    public EntradasBLL entradasBLL { get; set; }
+    
     public List<EntradasAlmacen> lista { get; set; } = new List<EntradasAlmacen>();
     public string? Filtro { get; set; }
     private DateOnly Fecha { get; set; }
     private string? Criterio { get; set; }
     private DateTime FechaDesde { get; set; } = new DateTime(1990, 12, 31);
     private DateTime FechaHasta { get; set; } = DateTime.Today.AddDays(1);
+    private Almacenes? almacen = new Almacenes();
+    private Transportistas? transportista = new Transportistas();
 
     protected override void OnInitialized()
     {
@@ -112,6 +125,7 @@
     public void Buscar()
     {
         lista = new List<EntradasAlmacen>();
+
         if (Criterio != null)
         {
             switch (Filtro)
@@ -138,16 +152,22 @@
                     }
                 case "3": //Almacen Origen
                     {
-                        lista = entradasBLL.GetList(m => m.AlmacenOrigen.DenominacionCentro.ToLower().Contains(Criterio.ToLower()) 
-                            && m.FechaEntrada >= FechaDesde && m.FechaEntrada <= FechaHasta);
-
+                        var listaAlmacenes = almacenBLL.GetList().Where(m => m.DenominacionCentro.Contains(Criterio));
+                        foreach(var almacen in listaAlmacenes)
+                        {
+                            lista.AddRange(entradasBLL.GetList(m => m.AlmacenId == almacen.AlmacenId && m.FechaEntrada >= FechaDesde &&
+                                m.FechaEntrada <= FechaHasta));
+                        }
                         break;
                     }
                 case "4": //nombre transportista
                 {
-                    lista= entradasBLL.GetList(m => m.Transportista.Nombres.ToLower().Contains(Criterio.ToLower())
-                        || m.Transportista.Apellidos.ToLower().Contains(Criterio.ToLower()) && m.FechaEntrada >= FechaDesde 
-                            && m.FechaEntrada <=FechaHasta);
+                    var listaTransportistas = transportistaBLL.GetList(m => m.Nombres.Contains(Criterio) || m.Apellidos.Contains(Criterio));
+                    foreach (var transportista in listaTransportistas)
+                    {
+                        lista.AddRange(entradasBLL.GetList(m => m.TransportistaId == transportista.TransportistaId && m.FechaEntrada >= FechaDesde &&
+                            m.FechaEntrada <= FechaHasta));
+                    }
                     break;
                 }
                 case "5": //Carnet Transportista
@@ -156,8 +176,14 @@
                     if(Carnet==-1)
                         lista = entradasBLL.GetList(m => m.FechaEntrada >= FechaDesde && m.FechaEntrada <= FechaHasta);
                     else
-                        lista = entradasBLL.GetList(m => m.Transportista.NumeroCarnet == Carnet 
-                            && m.FechaEntrada>= FechaDesde && m.FechaEntrada <= FechaHasta);
+                    {
+                        var listaTransportistas = transportistaBLL.GetList(m => m.NumeroCarnet == Carnet);
+                        foreach (var transportista in listaTransportistas)
+                        {
+                            lista.AddRange(entradasBLL.GetList(m => m.TransportistaId == transportista.TransportistaId && m.FechaEntrada >= FechaDesde &&
+                                m.FechaEntrada <= FechaHasta));
+                        }
+                    }
                     break;
                 }
                 case "6": // Precio total

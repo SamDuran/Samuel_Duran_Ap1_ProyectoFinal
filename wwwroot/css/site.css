@@ -69,3 +69,55 @@ a,
 .blazor-error-boundary::after {
     content: "An error has occurred."
 }
+
+/* PERSONALIZADO */
+.Loader-Container{
+    position: relative;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    margin-top:  18%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.Loader-Container .Loader{
+    position: absolute;
+    top:50%;
+    left:50%;
+    width: 100%;
+    height: 100%;
+    border: solid 20px transparent;
+    border-top-color: rgb(0, 37, 85);
+    border-left-color: rgb(0, 37, 85);
+    border-radius: 50%;
+    animation: Loader 1s linear infinite;
+}
+.Loader-Container .Loader2{
+    position: absolute;
+    top:50%;
+    left:50%;
+    width: 80%;
+    height: 80%;
+    border: solid 24px transparent;
+    border-top-color: rgb(0, 102, 255);
+    border-left-color: rgb(0, 102, 255);;
+    border-radius: 50%;
+    animation: Loader2 1s linear infinite;
+}
+@keyframes Loader {
+    0%{
+        transform: translate(-50%,-50%) rotate(0deg);
+        ;
+    }
+    100%{
+        transform: translate(-50%,-50%) rotate(360deg);
+    }
+}
+@keyframes Loader2 {
+    0%{
+        transform: translate(-50%,-50%) rotate(0deg);
+    }
+    100%{
+        transform: translate(-50%,-50%) rotate(-360deg);
+    }
+}

@@ -8,17 +8,26 @@ namespace Entidades
         [Key]
         public int EntradaId { get; set; }
 
-        [Required(ErrorMessage ="Se debe indicar la fecha de la entrada.")]
         public DateTime FechaEntrada { get; set; } = DateTime.Today;
 
-        [Required(ErrorMessage ="Se debe indicar un transportista")]
-        public Transportistas Transportista {get; set;} = new Transportistas();
+        public int TransportistaId { get; set; } //ForeignKey de Transportista
 
-        [Required(ErrorMessage ="Campo obligatorio, se debe indicar un almacen de orígen")]
-        public Almacenes AlmacenOrigen { get; set; } = new Almacenes();
+        public int AlmacenId { get; set; } //ForeignKey de Almacen        public Almacenes Almacen { get; set; } = new Almacenes();
+        
         public decimal PrecioTotal {get;set;}
 
-        [ForeignKey("EntradaId")] 
         public virtual List<MaterialesRecibidos> MaterialesRecibidos {get; set;}= new List<MaterialesRecibidos>();
+
+
+        //Constructores
+        public EntradasAlmacen(DateTime fecha, int IdTransportista, int idAlmacen, decimal precioTotal, List<MaterialesRecibidos> materiales)
+        {
+            FechaEntrada= fecha;
+            AlmacenId = idAlmacen;
+            TransportistaId = IdTransportista;
+            PrecioTotal = precioTotal;
+            MaterialesRecibidos=materiales;
+        }
+        public EntradasAlmacen(){}
     }
 }

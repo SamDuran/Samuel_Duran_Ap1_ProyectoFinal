@@ -92,7 +92,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("AlmacenOrigenAlmacenId")
+                    b.Property<int>("AlmacenId")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("FechaEntrada")
@@ -105,10 +105,6 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("EntradaId");
-
-                    b.HasIndex("AlmacenOrigenAlmacenId");
-
-                    b.HasIndex("TransportistaId");
 
                     b.ToTable("EntradasAlmacenes");
                 });
@@ -127,7 +123,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
 
                     b.Property<string>("Descripcion")
                         .IsRequired()
-                        .HasMaxLength(35)
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FechaRegistro")
@@ -143,6 +139,38 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                     b.HasKey("MaterialId");
 
                     b.ToTable("Materiales");
+
+                    b.HasData(
+                        new
+                        {
+                            MaterialId = 1,
+                            Cantidad = 0m,
+                            Costo = 200.00m,
+                            Descripcion = "Poste Hormigón",
+                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            UnidadesMedida = "Unidad",
+                            ValorInventario = 0.00m
+                        },
+                        new
+                        {
+                            MaterialId = 2,
+                            Cantidad = 2m,
+                            Costo = 300.00m,
+                            Descripcion = "Cable Cobre",
+                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            UnidadesMedida = "Metros",
+                            ValorInventario = 600.00m
+                        },
+                        new
+                        {
+                            MaterialId = 3,
+                            Cantidad = 0m,
+                            Costo = 30.00m,
+                            Descripcion = "Tornillo",
+                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            UnidadesMedida = "Unidad",
+                            ValorInventario = 0.00m
+                        });
                 });
 
             modelBuilder.Entity("Entidades.MaterialesDespachados", b =>
@@ -178,7 +206,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                     b.Property<decimal>("Cantidad")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("EntradaId")
+                    b.Property<int>("EntradasAlmacenEntradaId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("MaterialId")
@@ -186,9 +214,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("EntradaId");
-
-                    b.HasIndex("MaterialId");
+                    b.HasIndex("EntradasAlmacenEntradaId");
 
                     b.ToTable("MaterialesRecibidos");
                 });
@@ -245,25 +271,32 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                     b.HasKey("TransportistaId");
 
                     b.ToTable("Transportistas");
-                });
 
-            modelBuilder.Entity("Entidades.EntradasAlmacen", b =>
-                {
-                    b.HasOne("Entidades.Almacenes", "AlmacenOrigen")
-                        .WithMany()
-                        .HasForeignKey("AlmacenOrigenAlmacenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entidades.Transportistas", "Transportista")
-                        .WithMany()
-                        .HasForeignKey("TransportistaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AlmacenOrigen");
-
-                    b.Navigation("Transportista");
+                    b.HasData(
+                        new
+                        {
+                            TransportistaId = 1,
+                            Apellidos = "Perez",
+                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            Nombres = "Juan Steven",
+                            NumeroCarnet = 1000
+                        },
+                        new
+                        {
+                            TransportistaId = 2,
+                            Apellidos = "Duran",
+                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            Nombres = "Samuel",
+                            NumeroCarnet = 1001
+                        },
+                        new
+                        {
+                            TransportistaId = 3,
+                            Apellidos = "Perez",
+                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            Nombres = "Juan",
+                            NumeroCarnet = 1002
+                        });
                 });
 
             modelBuilder.Entity("Entidades.MaterialesDespachados", b =>
@@ -287,21 +320,11 @@ namespace Samuel_Duran_Ap1_PF.Migrations
 
             modelBuilder.Entity("Entidades.MaterialesRecibidos", b =>
                 {
-                    b.HasOne("Entidades.EntradasAlmacen", "entrada")
+                    b.HasOne("Entidades.EntradasAlmacen", null)
                         .WithMany("MaterialesRecibidos")
-                        .HasForeignKey("EntradaId")
+                        .HasForeignKey("EntradasAlmacenEntradaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("Entidades.Materiales", "material")
-                        .WithMany()
-                        .HasForeignKey("MaterialId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("entrada");
-
-                    b.Navigation("material");
                 });
 
             modelBuilder.Entity("Entidades.SalidasAlmacen", b =>
