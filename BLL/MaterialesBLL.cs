@@ -1,7 +1,7 @@
-using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
-using Entidades;
 using Dal;
+using Entidades;
+using Microsoft.EntityFrameworkCore;
 
 namespace BLL
 {
@@ -58,7 +58,7 @@ namespace BLL
         }
         public bool Guardar(Materiales material)
         {
-            if(Existe(material.MaterialId))
+            if (Existe(material.MaterialId))
                 return Modificar(material);
             else
                 return Insertar(material);
@@ -66,11 +66,11 @@ namespace BLL
         private bool Modificar(Materiales material)
         {
             bool paso = false;
-            
+
             try
             {
                 contexto.Entry(material).State = EntityState.Modified;
-                paso = contexto.SaveChanges()>0;
+                paso = contexto.SaveChanges() > 0;
             }
             catch (System.Exception)
             {
@@ -81,11 +81,11 @@ namespace BLL
         private bool Insertar(Materiales material)
         {
             bool paso = false;
-            
+
             try
             {
                 contexto.Materiales.Add(material);
-                paso = contexto.SaveChanges()>0;
+                paso = contexto.SaveChanges() > 0;
             }
             catch (System.Exception)
             {
@@ -95,26 +95,26 @@ namespace BLL
         }
         public bool Eliminar(int id)
         {
-            bool paso  = false;
+            bool paso = false;
             try
             {
                 var material = contexto.Materiales.Find(id);
-                if(material != null)
+                if (material != null)
                 {
                     contexto.Materiales.Remove(material);
-                    paso = contexto.SaveChanges()>0;
+                    paso = contexto.SaveChanges() > 0;
                 }
             }
             catch (System.Exception)
             {
-                
+
                 throw;
             }
             return paso;
         }
-        public List<Materiales> GetList(Expression<Func<Materiales, bool>>criterio)
+        public List<Materiales>? GetList(Expression<Func<Materiales, bool>> criterio)
         {
-            List<Materiales> lista = new List<Materiales>();
+            var lista = new List<Materiales>();
             try
             {
                 lista = contexto.Materiales
@@ -122,7 +122,7 @@ namespace BLL
                 .AsNoTracking()
                 .ToList();
             }
-            catch (System.Exception)
+            catch
             {
                 throw;
             }

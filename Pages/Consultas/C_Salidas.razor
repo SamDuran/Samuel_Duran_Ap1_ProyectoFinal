@@ -85,17 +85,22 @@
                 @foreach (var item in lista)
                 {
                     Fecha = DateOnly.FromDateTime(item.FechaSalida);
-                    <tr>
-                        <td>@item.SalidaId</td>
-                        <td>@Fecha</td>
-                        <td>@item.MaterialesDespachados.Count</td>
-                        <td>@item.AlmacenDestino.DenominacionCentro</td>
-                        <td>@item.Transportista.Nombres @item.Transportista.Apellidos</td>
-                        <td>@item.Transportista.NumeroCarnet</td>
-                        <td>@item.CostoTotal</td>
-                        <td><a class="btn btn-sm btn-outline-primary oi oi-eye" href="SalidasAlmacen/@item.SalidaId"> Ver</a>
-                        </td>
-                    </tr>
+                    almacen= almacenBLL.Buscar(item.AlmacenId);
+                    transportista= transportistasBLL.Buscar(item.TransportistaId);
+                    @if(almacen != null && transportista != null)
+                    {
+                        <tr>
+                            <td>@item.SalidaId</td>
+                            <td>@Fecha</td>
+                            <td>@item.MaterialesDespachados.Count</td>
+                            <td>@almacen.DenominacionCentro</td>
+                            <td>@transportista.Nombres @transportista.Apellidos</td>
+                            <td>@transportista.NumeroCarnet</td>
+                            <td>@item.CostoTotal</td>
+                            <td><a class="btn btn-sm btn-outline-primary oi oi-eye" href="SalidasAlmacen/@item.SalidaId"> Ver</a>
+                            </td>
+                        </tr>
+                    }
                 }
             }
         </tbody>
@@ -105,8 +110,10 @@
 
 @code {
 
-    public List<SalidasAlmacen> lista { get; set; } = new List<SalidasAlmacen>();
-    public string? Filtro { get; set; }
+    private List<SalidasAlmacen> lista { get; set; } = new List<SalidasAlmacen>();
+    private string? Filtro { get; set; } = string.Empty;
+    private Transportistas? transportista {get;set;} = new Transportistas();
+    private Almacenes? almacen {get;set;} = new Almacenes();
     private DateOnly Fecha { get; set; }
     private string? Criterio { get; set; }
     private DateTime FechaDesde { get; set; } = new DateTime(1990, 12, 31);
@@ -114,7 +121,7 @@
 
     protected override void OnInitialized()
     {
-        lista = salidasBLL.GetList(m => true);
+        lista = salidasBLL.GetList(m => true); 
     }
     public void Buscar()
     {
@@ -145,16 +152,23 @@
                     }
                 case "3": //Almacen Origen
                     {
-                        lista = salidasBLL.GetList(m => m.AlmacenDestino.DenominacionCentro.ToLower().Contains(Criterio.ToLower()) 
-                            && m.FechaSalida >= FechaDesde && m.FechaSalida <= FechaHasta);
+                        var listaAlmacenes = almacenBLL.GetList().Where(m => m.DenominacionCentro.Contains(Criterio));
+                        foreach(var almacen in listaAlmacenes)
+                        {
+                            lista.AddRange(salidasBLL.GetList(m => m.AlmacenId == almacen.AlmacenId && m.FechaSalida >= FechaDesde &&
+                                m.FechaSalida <= FechaHasta));
+                        }
 
                         break;
                     }
                 case "4": //nombre transportista
                 {
-                    lista= salidasBLL.GetList(m => m.Transportista.Nombres.ToLower().Contains(Criterio.ToLower())
-                        || m.Transportista.Apellidos.ToLower().Contains(Criterio.ToLower()) && m.FechaSalida >= FechaDesde 
-                            && m.FechaSalida <=FechaHasta);
+                    var listaTransportistas = transportistasBLL.GetList(m => m.Nombres.Contains(Criterio) || m.Apellidos.Contains(Criterio));
+                    foreach (var transportista in listaTransportistas)
+                    {
+                        lista.AddRange(salidasBLL.GetList(m => m.TransportistaId == transportista.TransportistaId && m.FechaSalida >= FechaDesde &&
+                            m.FechaSalida <= FechaHasta));
+                    }
                     break;
                 }
                 case "5": //Carnet Transportista
@@ -163,8 +177,14 @@
                     if(Carnet==-1)
                         lista = salidasBLL.GetList(m => m.FechaSalida >= FechaDesde && m.FechaSalida <= FechaHasta);
                     else
-                        lista = salidasBLL.GetList(m => m.Transportista.NumeroCarnet == Carnet 
-                            && m.FechaSalida>= FechaDesde && m.FechaSalida <= FechaHasta);
+                    {
+                        var listaTransportistas = transportistasBLL.GetList(m => m.NumeroCarnet == Carnet);
+                        foreach (var transportista in listaTransportistas)
+                        {
+                            lista.AddRange(salidasBLL.GetList(m => m.TransportistaId == transportista.TransportistaId && m.FechaSalida >= FechaDesde &&
+                                m.FechaSalida <= FechaHasta));
+                        }
+                    }
                     break;
                 }
                 case "6": // Precio total

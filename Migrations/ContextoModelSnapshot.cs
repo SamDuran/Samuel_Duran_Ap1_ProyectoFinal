@@ -147,7 +147,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                             Cantidad = 0m,
                             Costo = 200.00m,
                             Descripcion = "Poste Hormigón",
-                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            FechaRegistro = new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local),
                             UnidadesMedida = "Unidad",
                             ValorInventario = 0.00m
                         },
@@ -157,7 +157,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                             Cantidad = 2m,
                             Costo = 300.00m,
                             Descripcion = "Cable Cobre",
-                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            FechaRegistro = new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local),
                             UnidadesMedida = "Metros",
                             ValorInventario = 600.00m
                         },
@@ -167,7 +167,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                             Cantidad = 0m,
                             Costo = 30.00m,
                             Descripcion = "Tornillo",
-                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            FechaRegistro = new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local),
                             UnidadesMedida = "Unidad",
                             ValorInventario = 0.00m
                         });
@@ -225,7 +225,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("AlmacenDestinoAlmacenId")
+                    b.Property<int>("AlmacenId")
                         .HasColumnType("INTEGER");
 
                     b.Property<decimal>("CostoTotal")
@@ -238,10 +238,6 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         .HasColumnType("INTEGER");
 
                     b.HasKey("SalidaId");
-
-                    b.HasIndex("AlmacenDestinoAlmacenId");
-
-                    b.HasIndex("TransportistaId");
 
                     b.ToTable("SalidasAlmacen");
                 });
@@ -277,7 +273,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         {
                             TransportistaId = 1,
                             Apellidos = "Perez",
-                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            FechaRegistro = new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local),
                             Nombres = "Juan Steven",
                             NumeroCarnet = 1000
                         },
@@ -285,7 +281,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         {
                             TransportistaId = 2,
                             Apellidos = "Duran",
-                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            FechaRegistro = new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local),
                             Nombres = "Samuel",
                             NumeroCarnet = 1001
                         },
@@ -293,7 +289,7 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         {
                             TransportistaId = 3,
                             Apellidos = "Perez",
-                            FechaRegistro = new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local),
+                            FechaRegistro = new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local),
                             Nombres = "Juan",
                             NumeroCarnet = 1002
                         });
@@ -325,25 +321,6 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         .HasForeignKey("EntradasAlmacenEntradaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Entidades.SalidasAlmacen", b =>
-                {
-                    b.HasOne("Entidades.Almacenes", "AlmacenDestino")
-                        .WithMany()
-                        .HasForeignKey("AlmacenDestinoAlmacenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Entidades.Transportistas", "Transportista")
-                        .WithMany()
-                        .HasForeignKey("TransportistaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AlmacenDestino");
-
-                    b.Navigation("Transportista");
                 });
 
             modelBuilder.Entity("Entidades.EntradasAlmacen", b =>

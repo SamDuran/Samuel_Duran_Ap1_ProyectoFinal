@@ -71,7 +71,7 @@
             </tr>
         </thead>
         <tbody>
-            @if (lista.Count == 0)
+            @if (lista==null || lista.Count == 0)
             {
                 <span style="color:#FFFFFF; text-shadow: 1.5px 2px rgba(0, 0, 0, 0.4); margin: 20px; text-align:center">No
                     hay materiales registrados</span>
@@ -100,7 +100,7 @@
 
 
 @code {
-    public List<Materiales> lista { get; set; } = new List<Materiales>();
+    public List<Materiales>? lista { get; set; } = new List<Materiales>();
     public string? Filtro { get; set; }
     private DateOnly Fecha { get; set; }
     private string? Criterio { get; set; }

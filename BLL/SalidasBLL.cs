@@ -2,14 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using Entidades;
 using Dal;
-
 namespace BLL
 {
     public partial class SalidasBLL
     {
         private Contexto contexto {get;set;}
         public SalidasBLL(Contexto _contexto){ contexto  = _contexto; }
-
         public SalidasAlmacen? Buscar(int id)
         {
             SalidasAlmacen? salidaBuscada;
@@ -17,12 +15,9 @@ namespace BLL
             try
             {
                 salidaBuscada = contexto.SalidasAlmacen.AsNoTracking()
-                .Where(s => s.SalidaId==id)
                 .Include(s => s.MaterialesDespachados)
                 .ThenInclude(d => d.Material).AsNoTracking()
-                .Include(s=>s.AlmacenDestino).AsNoTracking()
-                .Include(s => s.Transportista).AsNoTracking()
-                .FirstOrDefault();
+                .FirstOrDefault(s => s.SalidaId==id);
             }
             catch (System.Exception)
             {
@@ -67,6 +62,7 @@ namespace BLL
                 }
                 contexto.Entry(salida).State = EntityState.Added;
                 paso = contexto.SaveChanges()>0;
+                contexto.Entry(salida).State = EntityState.Detached;
             }
             catch (System.Exception)
             {
@@ -83,15 +79,13 @@ namespace BLL
                 var SalidaAnterior = contexto.SalidasAlmacen
                 .Include(s => s.MaterialesDespachados)
                 .ThenInclude(s => s.Material).AsNoTracking()
-                .Include(s => s.AlmacenDestino).AsNoTracking()
-                .Include(s => s.Transportista).AsNoTracking()
-                .Where(s => s.SalidaId == salidaModificada.SalidaId)
-                .AsNoTracking().SingleOrDefault();
+                .AsNoTracking().FirstOrDefault(s => s.SalidaId == salidaModificada.SalidaId);
 
                 if(SalidaAnterior!=null)
                 {
                     foreach(var despachadoAnterior in SalidaAnterior.MaterialesDespachados)
                     {
+                        
                         despachadoAnterior.Material.Cantidad += despachadoAnterior.Cantidad;
                         despachadoAnterior.Material.ValorInventario = despachadoAnterior.Material.Cantidad*despachadoAnterior.Material.Costo;
                     }
@@ -107,6 +101,8 @@ namespace BLL
                     }
                     contexto.Entry(salidaModificada).State = EntityState.Modified;
                     paso = contexto.SaveChanges()>0;
+                    contexto.Entry(salidaModificada).State = EntityState.Detached;
+                    
                 }
             }
             catch (System.Exception)
@@ -136,6 +132,7 @@ namespace BLL
 
                     contexto.Remove(salida);
                     paso = contexto.SaveChanges()>0;
+                    contexto.Entry(salida).State = EntityState.Detached;
                 }
             }
             catch (System.Exception)
@@ -151,11 +148,8 @@ namespace BLL
             try
             {
                 lista=contexto.SalidasAlmacen
-                .Include(s => s.AlmacenDestino).AsNoTracking()
-                .Include(s =>s.Transportista).AsNoTracking()
                 .Include(s =>s.MaterialesDespachados).ThenInclude(s =>s.Material).AsNoTracking()
-                .Where(criterio)
-                .AsNoTracking()
+                .Where(criterio).AsNoTracking()
                 .ToList();
             }
             catch (System.Exception)

@@ -58,6 +58,22 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SalidasAlmacen",
+                columns: table => new
+                {
+                    SalidaId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    FechaSalida = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    TransportistaId = table.Column<int>(type: "INTEGER", nullable: false),
+                    AlmacenId = table.Column<int>(type: "INTEGER", nullable: false),
+                    CostoTotal = table.Column<decimal>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SalidasAlmacen", x => x.SalidaId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Transportistas",
                 columns: table => new
                 {
@@ -91,34 +107,6 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                         column: x => x.EntradasAlmacenEntradaId,
                         principalTable: "EntradasAlmacenes",
                         principalColumn: "EntradaId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "SalidasAlmacen",
-                columns: table => new
-                {
-                    SalidaId = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    FechaSalida = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    TransportistaId = table.Column<int>(type: "INTEGER", nullable: false),
-                    CostoTotal = table.Column<decimal>(type: "TEXT", nullable: false),
-                    AlmacenDestinoAlmacenId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_SalidasAlmacen", x => x.SalidaId);
-                    table.ForeignKey(
-                        name: "FK_SalidasAlmacen_Almacenes_AlmacenDestinoAlmacenId",
-                        column: x => x.AlmacenDestinoAlmacenId,
-                        principalTable: "Almacenes",
-                        principalColumn: "AlmacenId",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_SalidasAlmacen_Transportistas_TransportistaId",
-                        column: x => x.TransportistaId,
-                        principalTable: "Transportistas",
-                        principalColumn: "TransportistaId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -192,32 +180,32 @@ namespace Samuel_Duran_Ap1_PF.Migrations
             migrationBuilder.InsertData(
                 table: "Materiales",
                 columns: new[] { "MaterialId", "Cantidad", "Costo", "Descripcion", "FechaRegistro", "UnidadesMedida", "ValorInventario" },
-                values: new object[] { 1, 0m, 200.00m, "Poste Hormigón", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Unidad", 0.00m });
+                values: new object[] { 1, 0m, 200.00m, "Poste Hormigón", new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local), "Unidad", 0.00m });
 
             migrationBuilder.InsertData(
                 table: "Materiales",
                 columns: new[] { "MaterialId", "Cantidad", "Costo", "Descripcion", "FechaRegistro", "UnidadesMedida", "ValorInventario" },
-                values: new object[] { 2, 2m, 300.00m, "Cable Cobre", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Metros", 600.00m });
+                values: new object[] { 2, 2m, 300.00m, "Cable Cobre", new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local), "Metros", 600.00m });
 
             migrationBuilder.InsertData(
                 table: "Materiales",
                 columns: new[] { "MaterialId", "Cantidad", "Costo", "Descripcion", "FechaRegistro", "UnidadesMedida", "ValorInventario" },
-                values: new object[] { 3, 0m, 30.00m, "Tornillo", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Unidad", 0.00m });
+                values: new object[] { 3, 0m, 30.00m, "Tornillo", new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local), "Unidad", 0.00m });
 
             migrationBuilder.InsertData(
                 table: "Transportistas",
                 columns: new[] { "TransportistaId", "Apellidos", "FechaRegistro", "Nombres", "NumeroCarnet" },
-                values: new object[] { 1, "Perez", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Juan Steven", 1000 });
+                values: new object[] { 1, "Perez", new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local), "Juan Steven", 1000 });
 
             migrationBuilder.InsertData(
                 table: "Transportistas",
                 columns: new[] { "TransportistaId", "Apellidos", "FechaRegistro", "Nombres", "NumeroCarnet" },
-                values: new object[] { 2, "Duran", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Samuel", 1001 });
+                values: new object[] { 2, "Duran", new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local), "Samuel", 1001 });
 
             migrationBuilder.InsertData(
                 table: "Transportistas",
                 columns: new[] { "TransportistaId", "Apellidos", "FechaRegistro", "Nombres", "NumeroCarnet" },
-                values: new object[] { 3, "Perez", new DateTime(2022, 6, 21, 0, 0, 0, 0, DateTimeKind.Local), "Juan", 1002 });
+                values: new object[] { 3, "Perez", new DateTime(2022, 7, 6, 0, 0, 0, 0, DateTimeKind.Local), "Juan", 1002 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_MaterialesDespachados_MaterialId",
@@ -233,25 +221,21 @@ namespace Samuel_Duran_Ap1_PF.Migrations
                 name: "IX_MaterialesRecibidos_EntradasAlmacenEntradaId",
                 table: "MaterialesRecibidos",
                 column: "EntradasAlmacenEntradaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SalidasAlmacen_AlmacenDestinoAlmacenId",
-                table: "SalidasAlmacen",
-                column: "AlmacenDestinoAlmacenId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SalidasAlmacen_TransportistaId",
-                table: "SalidasAlmacen",
-                column: "TransportistaId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Almacenes");
+
+            migrationBuilder.DropTable(
                 name: "MaterialesDespachados");
 
             migrationBuilder.DropTable(
                 name: "MaterialesRecibidos");
+
+            migrationBuilder.DropTable(
+                name: "Transportistas");
 
             migrationBuilder.DropTable(
                 name: "Materiales");
@@ -261,12 +245,6 @@ namespace Samuel_Duran_Ap1_PF.Migrations
 
             migrationBuilder.DropTable(
                 name: "EntradasAlmacenes");
-
-            migrationBuilder.DropTable(
-                name: "Almacenes");
-
-            migrationBuilder.DropTable(
-                name: "Transportistas");
         }
     }
 }

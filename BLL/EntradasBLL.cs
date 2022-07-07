@@ -9,7 +9,6 @@ namespace BLL
     {
         private Contexto contexto;
         public EntradasBLL(Contexto _contexto) { contexto = _contexto; }
-
         private bool Existe(int id)
         {
             bool existe = false;
@@ -36,7 +35,8 @@ namespace BLL
             bool paso = false;
             try
             {
-                var entradaAnterior = contexto.EntradasAlmacenes.AsNoTracking()
+                var entradaAnterior = contexto.EntradasAlmacenes
+                .AsNoTracking()
                 .Include(e => e.MaterialesRecibidos)
                 .SingleOrDefault(e => e.EntradaId == entrada.EntradaId);
 
@@ -54,11 +54,9 @@ namespace BLL
                             entrada.PrecioTotal -= material.Costo * recibido.Cantidad; //Recalculamos el valor total de la entrada
                         }
                     }
-                    //Borro los materiales recibidos de la entrada anterior
+                    
                     contexto.Database.ExecuteSqlRaw($"Delete FROM MaterialesRecibidos WHERE EntradasAlmacenEntradaId={entradaAnterior.EntradaId}");
-                    //rehago sus recibidos
-                    RehacerDetalles(entrada);
-                    RehacerDetalles(entradaAnterior);
+                    
                     
                     MaterialesRecibidos? recibidoDeEntradaAnterior;
                     foreach (var recibido in entrada.MaterialesRecibidos)
@@ -78,11 +76,9 @@ namespace BLL
                         material = null;
                         recibidoDeEntradaAnterior = null;
                     }
-                    entradaAnterior = null;
-                    Materialrecibido = null;
-
                     contexto.Entry(entrada).State = EntityState.Modified;
                     paso = contexto.SaveChanges() > 0;
+                    contexto.Entry(entrada).State = EntityState.Detached;
                 }
             }
             catch (System.Exception)
@@ -90,17 +86,6 @@ namespace BLL
                 throw;
             }
             return paso;
-        }
-        private void RehacerDetalles(EntradasAlmacen entrada)
-        {
-            List<MaterialesRecibidos> lista = new List<MaterialesRecibidos>();
-            foreach (var recibido in entrada.MaterialesRecibidos)
-            {
-                lista.Add(new MaterialesRecibidos
-                (recibido.Cantidad, recibido.EntradasAlmacenEntradaId, recibido.MaterialId));
-            }
-            entrada.MaterialesRecibidos.Clear();
-            entrada.MaterialesRecibidos = lista;
         }
         private bool Insertar(EntradasAlmacen entrada)
         {
@@ -124,6 +109,7 @@ namespace BLL
                 }
                 contexto.Entry(entrada).State = EntityState.Added;
                 paso = contexto.SaveChanges() > 0;
+                contexto.Entry(entrada).State = EntityState.Detached;
             }
             catch (Exception)
             {
@@ -169,6 +155,7 @@ namespace BLL
                     }
                     contexto.EntradasAlmacenes.Remove(entrada);
                     paso = contexto.SaveChanges() > 0;
+                    contexto.Entry(entrada).State = EntityState.Detached;
                 }
             }
             catch (System.Exception)

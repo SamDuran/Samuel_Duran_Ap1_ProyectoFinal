@@ -12,22 +12,10 @@ namespace Entidades
 
         public int TransportistaId { get; set; } //ForeignKey de Transportista
 
-        public int AlmacenId { get; set; } //ForeignKey de Almacen        public Almacenes Almacen { get; set; } = new Almacenes();
+        public int AlmacenId { get; set; } //ForeignKey de Almacen 
         
         public decimal PrecioTotal {get;set;}
 
         public virtual List<MaterialesRecibidos> MaterialesRecibidos {get; set;}= new List<MaterialesRecibidos>();
-
-
-        //Constructores
-        public EntradasAlmacen(DateTime fecha, int IdTransportista, int idAlmacen, decimal precioTotal, List<MaterialesRecibidos> materiales)
-        {
-            FechaEntrada= fecha;
-            AlmacenId = idAlmacen;
-            TransportistaId = IdTransportista;
-            PrecioTotal = precioTotal;
-            MaterialesRecibidos=materiales;
-        }
-        public EntradasAlmacen(){}
     }
 }

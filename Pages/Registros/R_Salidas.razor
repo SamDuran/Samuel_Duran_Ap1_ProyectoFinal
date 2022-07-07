@@ -8,13 +8,14 @@
 @inject TransportistasBLL transportistasBLL
 
 <PageTitle>Salidas de material</PageTitle>
-@if(isLoading)
+@if (isLoading)
 {
     <div class="Loader-Container">
-        <div class="Loader"/>
-        <div class="Loader2"/>
+        <div class="Loader" />
+        <div class="Loader2" />
     </div>
-}else
+}
+else
 {
 
     <EditForm Model="Salida" OnValidSubmit="Guardar">
@@ -38,7 +39,7 @@
                                     <InputNumber @bind-Value="Salida.SalidaId" class="form-control col-4" />
                                     <div class="input-group-append">
                                         <button type="button" style="z-index: 0;" class="btn btn-primary input-group-text"
-                                            @onclick="Buscar"><span class="oi oi-magnifying-glass">Buscar</span></button>
+                                        @onclick="Buscar"><span class="oi oi-magnifying-glass">Buscar</span></button>
                                     </div>
                                 </div>
                             </div>
@@ -55,74 +56,80 @@
 
                     @* Almacen Destino *@
                     <div class="input-group" style="margin-top: 18px; margin-bottom: 18px;">
-                        <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Almacen Destino</span>
-                        <InputSelect @bind-Value="Salida.AlmacenDestino.AlmacenId" class="form-select text-14 col-4">
+                        <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Almacen
+                            Destino</span>
+                        <InputSelect @bind-Value="Salida.AlmacenId" class="form-select text-14 col-4">
                             <option selected hidden value="0">-- Seleccione un almacen Destino --</option>
                             @foreach (var almacen in listaAlmacenes)
                             {
-                                <option value="@almacen.AlmacenId">@almacen.DenominacionCentro: @almacen.NombreCentro</option>
+                            <option value="@almacen.AlmacenId">@almacen.DenominacionCentro: @almacen.NombreCentro</option>
                             }
-                        </InputSelect>
-                    </div>
+                    </InputSelect>
+                </div>
 
-                    @* Transportista *@
-                    <div class="input-group" style="margin-top: 18px; margin-bottom: 18px;">
-                        <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Transportista</span>
-                        <InputSelect @bind-Value="Salida.Transportista.TransportistaId" class="form-select text-14 col-4">
-                            <option selected hidden value="0">-- Seleccione un transportista --</option>
-                            @foreach (var transportista in listaTransportistas)
+                @* Transportista *@
+                <div class="input-group" style="margin-top: 18px; margin-bottom: 18px;">
+                    <span class="input-group-text" style="background-color: #c5c5c550;width: 20%;">Transportista</span>
+                    <InputSelect @bind-Value="Salida.TransportistaId" class="form-select text-14 col-4">
+                        <option selected hidden value="0">-- Seleccione un transportista --</option>
+                        @foreach (var transportista in listaTransportistas)
                             {
-                                <option value="@transportista.TransportistaId">@transportista.Nombres @transportista.Apellidos</option>
+                            <option value="@transportista.TransportistaId">@transportista.Nombres @transportista.Apellidos
+                            </option>
                             }
-                        </InputSelect>
+                    </InputSelect>
+                </div>
+                @* subcard Materiales *@
+                <div class="card">
+
+                    <div class="card-header">
+                        <h3>Materiales Despachados</h3>
                     </div>
-                    @* subcard Materiales *@
-                    <div class="card">
 
-                        <div class="card-header">
-                            <h3>Materiales Despachados</h3>
-                        </div>
-
-                        <div class="card-body">
-                            <div class="input-group d-flex align-items-end">
-                                <div class="flex-fill mx-2">
-                                    <label>Material</label>
-                                    <InputSelect @bind-Value="materialID" class="form-select text-14">
-                                        <option value="" selected="selected" disabled="disabled" hidden="hidden">
-                                            -- Seleccione un material --</option>
-                                        @foreach (var item in listaMateriales)
+                    <div class="card-body">
+                        <div class="input-group d-flex align-items-end">
+                            <div class="flex-fill mx-2">
+                                <label>Material</label>
+                                <InputSelect @bind-Value="materialID" class="form-select text-14">
+                                    <option value="" selected="selected" disabled="disabled" hidden="hidden">
+                                        -- Seleccione un material --</option>
+                                    @if (listaMateriales != null)
                                         {
-                                            <option value="@item.MaterialId.ToString()">@item.Descripcion (Cantidad: @item.Cantidad @item.UnidadesMedida)</option>
+                                        @foreach (var item in listaMateriales)
+                                            {
+                                            <option value="@item.MaterialId.ToString()">@item.Descripcion (Cantidad:
+                                                @item.Cantidad @item.UnidadesMedida)</option>
+                                            }
                                         }
-                                    </InputSelect>
-                                </div>
-                                <div class="flex-fill mx-2" style="width: 12px;">
-                                    <label>Cantidad</label>
-                                    <InputNumber class="form-control" @bind-Value="Despachado.Cantidad" />
-                                </div>
-                                <div class="input-group-append">
-                                    <button type="button" style="z-index: 0;" class="btn btn-primary input-group-text"
-                                        @onclick="AgregarDespachado">
-                                        <span class="oi oi-plus"> Add</span>
-                                    </button>
-                                </div>
+                                </InputSelect>
+                            </div>
+                            <div class="flex-fill mx-2" style="width: 12px;">
+                                <label>Cantidad</label>
+                                <InputNumber class="form-control" @bind-Value="Despachado.Cantidad" />
+                            </div>
+                            <div class="input-group-append">
+                                <button type="button" style="z-index: 0;" class="btn btn-primary input-group-text"
+                                    @onclick="AgregarDespachado">
+                                    <span class="oi oi-plus"> Add</span>
+                                </button>
                             </div>
                         </div>
-                        <div class="card-footer">
-                            @* Tabla de detalles *@
-                            <table class="table t">
-                                <thead class="thead">
-                                    <tr class="table">
-                                        <th>ID Material</th>
-                                        <th>Descripci&oacute;n</th>
-                                        <th>Cantidad</th>
-                                        <th>Costo material</th>
-                                        <th>Costo Total</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach (var Despachado in Salida.MaterialesDespachados)
+                    </div>
+                    <div class="card-footer">
+                        @* Tabla de detalles *@
+                        <table class="table t">
+                            <thead class="thead">
+                                <tr class="table">
+                                    <th>ID Material</th>
+                                    <th>Descripci&oacute;n</th>
+                                    <th>Cantidad</th>
+                                    <th>Costo material</th>
+                                    <th>Costo Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var Despachado in Salida.MaterialesDespachados)
                                     {
                                         costoDespachado = Despachado.Cantidad * Despachado.Material.Costo;
                                         <tr>
@@ -132,7 +139,7 @@
                                             <td>@Despachado.Material.Costo</td>
                                             <td>@costoDespachado</td>
                                             <td><span class="btn btn-sm btn-outline-secondary oi oi-x"
-                                                @onclick="@(() => RemoverDespachado(Despachado))"></span></td>
+                                            @onclick="@(() => RemoverDespachado(Despachado))"></span></td>
                                         </tr>
                                     }
                                 </tbody>
@@ -140,7 +147,7 @@
                             <div Class="form-group" style="margin: 22px; width: 35%; display: right;">
                                 <div class="input-group">
                                     <span class="input-group-text">Costo Total de Salida:</span>
-                                    <InputNumber readonly class="form-control" @bind-Value="Salida.CostoTotal"/>
+                                    <InputNumber readonly class="form-control" @bind-Value="Salida.CostoTotal" />
                                     <span class="input-group-text">$RD</span>
                                 </div>
                             </div>
@@ -152,10 +159,10 @@
                     @* Botones *@
                     <div class="form-group text-center" style="justify-content: space-between;">
                         <button type="button" style="margin: 10px;" class="btn btn-lg btn-primary"
-                            @onclick="Nuevo">Nuevo</button>
+                        @onclick="Nuevo">Nuevo</button>
                         <button type="submit" style="margin: 10px;" class="btn btn-lg btn-success">Guardar</button>
                         <button type="button" style="margin: 10px;" class="btn btn-lg btn-danger"
-                            @onclick="Eliminar">Eliminar</button>
+                        @onclick="Eliminar">Eliminar</button>
                     </div>
                 </div>
             </div>
@@ -167,28 +174,33 @@
 
     [Parameter]
     public int SalidaId { get; set; }
-    private bool isLoading {get;set;}= false;
-    private decimal costoDespachado {get;set;}
+    private bool isLoading { get; set; } = false;
+    private decimal costoDespachado { get; set; }
 
     public Almacenes? AlmacenDestino = new Almacenes();
     public Transportistas? transportista = new Transportistas();
     public MaterialesDespachados Despachado { get; set; } = new MaterialesDespachados();
     public Materiales? material { get; set; } = new Materiales();
-    public string? materialID { get; set; } ="";
+    public string? materialID { get; set; } = "";
     public SalidasAlmacen Salida { get; set; } = new SalidasAlmacen();
     public List<Almacenes> listaAlmacenes { get; set; } = new List<Almacenes>();
-    public List<Materiales> listaMateriales { get; set; } = new List<Materiales>();
+    public List<Materiales>? listaMateriales { get; set; } = new List<Materiales>();
     public List<Transportistas> listaTransportistas { get; set; } = new List<Transportistas>();
 
 
     protected override void OnInitialized()
     {
-        listaAlmacenes = almacenBLL.GetList();
         listaMateriales = materialesBLL.GetList(e => true);
+        if (listaMateriales == null || listaMateriales.Count == 0)
+        {
+            toastService.ShowError("No hay materiales registrados. Por favor intente registrar un material.");
+            return;
+        }
+        listaAlmacenes = almacenBLL.GetList();
         listaTransportistas = transportistasBLL.GetList(t => true);
         Salida.SalidaId = SalidaId;
         Buscar();
-        isLoading=false;
+        isLoading = false;
     }
     public void Buscar()
     {
@@ -205,7 +217,7 @@
     public void AgregarDespachado()
     {
         this.material = materialesBLL.Buscar(Utilities.ToInt(materialID));
-        this.Despachado.Material = (material!=null)?material: new Materiales();
+        this.Despachado.Material = (material != null) ? material : new Materiales();
         Despachado = VerificarDespachado(Despachado);
 
         Salida.CostoTotal += Despachado.Cantidad * Despachado.Material.Costo;
@@ -221,7 +233,7 @@
             var materialBuscado = Salida.MaterialesDespachados.Find(m => m.Material.MaterialId == Despachado.Material.MaterialId);
             if (materialBuscado != null)
             {
-                Salida.CostoTotal -= materialBuscado.Cantidad*Despachado.Material.Costo;
+                Salida.CostoTotal -= materialBuscado.Cantidad * Despachado.Material.Costo;
                 Despachado.Cantidad += materialBuscado.Cantidad;
                 Salida.MaterialesDespachados.Remove(materialBuscado);
                 Salida.MaterialesDespachados.Add(Despachado);
@@ -237,17 +249,8 @@
     }
     public void Guardar()
     {
-        if(SalidaValida())
+        if (SalidaValida())
         {
-            AlmacenDestino = almacenBLL.Buscar(Salida.AlmacenDestino.AlmacenId);
-            transportista = transportistasBLL.Buscar(Salida.Transportista.TransportistaId);
-
-            if (AlmacenDestino != null)
-                Salida.AlmacenDestino = AlmacenDestino;
-
-            if(transportista != null) 
-                Salida.Transportista = transportista;
-
             if (salidasBLL.Guardar(Salida))
             {
                 toastService.ShowSuccess("Se guardó exitosamente");
@@ -278,17 +281,17 @@
     private bool SalidaValida()
     {
         bool valido = true;
-        if(Salida.MaterialesDespachados.Count<=0)
+        if (Salida.MaterialesDespachados.Count <= 0)
         {
             toastService.ShowError("Se debe indicar al menos un material de salida.", "Operacion invalida");
-            valido=false;
+            valido = false;
         }
-        if(Salida.Transportista.TransportistaId==0)
+        if (Salida.TransportistaId == 0)
         {
             toastService.ShowError("Se debe indicar un transportista.", "Operacion invalida");
             valido = false;
         }
-        if(Salida.AlmacenDestino.AlmacenId==0)
+        if (Salida.AlmacenId == 0)
         {
             toastService.ShowError("Se debe indicar un almacen de destino.", "Operacion invalida");
             valido = false;
@@ -297,9 +300,9 @@
     }
     private MaterialesDespachados VerificarDespachado(MaterialesDespachados Despachado)
     {
-        if(Despachado.Cantidad>Despachado.Material.Cantidad)//si se pasa de los disponibles
-            Despachado.Cantidad=Despachado.Material.Cantidad;
-        
+        if (Despachado.Cantidad > Despachado.Material.Cantidad)//si se pasa de los disponibles
+            Despachado.Cantidad = Despachado.Material.Cantidad;
+
         return Despachado;
     }
 }

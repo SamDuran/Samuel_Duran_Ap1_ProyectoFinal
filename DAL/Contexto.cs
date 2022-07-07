@@ -6,14 +6,15 @@ namespace Dal;
 public partial class Contexto : DbContext
 {
     /* OnModelCreating */
-    public DbSet<Almacenes> Almacenes {get;set;} 
+    public DbSet<Almacenes> Almacenes {get;set;} = null!;
     /* Registros y consultas */
-    public DbSet<EntradasAlmacen> EntradasAlmacenes {get;set;} //Registro
-    public DbSet<Materiales> Materiales {get;set;} //Registro
-    public DbSet<Transportistas> Transportistas {get;set;} //Registro
-    public DbSet<SalidasAlmacen> SalidasAlmacen {get;set;} //Registro
+    public DbSet<EntradasAlmacen> EntradasAlmacenes {get;set;}  = null!;//Registro
+    public DbSet<Materiales> Materiales {get;set;} = null!;//Registro
+    public DbSet<Transportistas> Transportistas {get;set;} = null!;//Registro
+    public DbSet<SalidasAlmacen> SalidasAlmacen {get;set;} = null!;//Registro
 
-    public Contexto(DbContextOptions<Contexto> options): base(options){}
+    public Contexto(DbContextOptions<Contexto> options): base(options){
+    }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
